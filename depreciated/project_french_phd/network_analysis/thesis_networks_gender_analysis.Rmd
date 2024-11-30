@@ -1,0 +1,182 @@
+---
+title: "Networks and Gender"
+output: 
+  html_document:
+    theme: united
+    toc: true
+    number_sections: true
+    toc_float: true
+    toc_depth: 4
+    code_folding: hide
+    self_contained: TRUE
+---
+
+```{css, echo=FALSE}
+body .main-container {
+max-width: 80% !important;
+width: 80% !important;
+margin: auto;
+}
+body {
+max-width: 80% !important;
+}
+```
+
+```{css zoom-lib-src, echo = FALSE}
+# Follows the css and js script used for allow zooming in graphs
+script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+```
+
+```{js zoom-jquery, echo = FALSE}
+$(document).ready(function() {
+$('body').prepend('<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>');
+// onClick function for all plots (img's)
+$('img:not(.zoomImg)').click(function() {
+$('.zoomImg').attr('src', $(this).attr('src')).css({width: '100%'});
+$('.zoomDiv').css({opacity: '1', width: 'auto', border: '1px solid white', borderRadius: '5px', position: 'fixed', top: '50%', left: '50%', marginRight: '-50%', transform: 'translate(-50%, -50%)', boxShadow: '0px 0px 50px #888888', zIndex: '50', overflow: 'auto', maxHeight: '100%'});
+});
+// onClick function for zoomImg
+$('img.zoomImg').click(function() {
+$('.zoomDiv').css({opacity: '0', width: '0%'}); 
+});
+});
+```
+
+```{r setup, include=FALSE}
+source(here::here("0_paths_and_packages.R"))
+
+thesis_table <- readRDS(here(FR_cleaned_data_path, "thesis_table.rds")) %>% as.data.table()
+people_table <- readRDS(here(FR_cleaned_data_path, "people_table.RDS")) %>% as.data.table()
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+#### Gender table WoS ####
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+# making the gender table
+gender_table <- fread("D:/Téléchargements/gender_2021.csv") %>% as.data.table()
+gender_table[,gender:=tolower(gender)] 
+gender_table[,First_Name_cleaned:=str_replace_all(First_Name, "\\w*\\.\\w*","")] # remove name with point (middle names and other weird stuff)
+gender_table[,First_Name_cleaned:=str_replace_all(First_Name_cleaned, "\\(|\\)","")] # remove parentheses
+gender_table[,First_Name_cleaned:=str_replace_all(First_Name_cleaned, "[:punct:]","")] # remove all punctuation (we don't need dots anymore)
+gender_table[,First_Name_cleaned:=str_replace_all(First_Name_cleaned, "\\b.{1}\\b","")] # remove single letters
+
+gender_table[,First_Name_cleaned:=str_squish(First_Name_cleaned)] # remove extra white spaces
+gender_table[,First_Name_cleaned:=tolower(First_Name_cleaned)] 
+gender_table[,First_Name_cleaned:=stringi::stri_trans_general(First_Name_cleaned, "Latin-ASCII")] # remove accents, now we have some duplicate and possible diferences between previously differentiated prenom
+
+gender_table <- gender_table[First_Name_cleaned!=""]
+
+gender_table_cleaned <- gender_table[gender=="m" | gender=="f" | gender=="uni", .(gender,First_Name_cleaned)]
+
+gender_table_cleaned <- data.table::dcast(gender_table_cleaned, First_Name_cleaned ~ gender, fun.aggregate=length)
+
+gender_table_cleaned[, n_name:=f+m+uni]
+gender_table_cleaned[, share_m:=m/n_name]
+gender_table_cleaned[, share_f:=f/n_name]
+
+gender_table_cleaned[share_m>=0.9, gender_cleaned:="m"]
+gender_table_cleaned[share_f>=0.9, gender_cleaned:="f"]
+gender_table_cleaned[is.na(gender_cleaned), gender_cleaned:="unk"]
+
+#people table
+people_table_name <- copy(people_table)
+people_table_name[,prenom:=str_replace_all(prenom, "[:punct:]","")] # remove all punctuation
+people_table_name[,prenom:=tolower(prenom)] 
+people_table_name[,prenom:=stringi::stri_trans_general(prenom, "Latin-ASCII")] 
+
+prenom_gender_match <- merge(people_table_name, gender_table_cleaned[,list("prenom"=First_Name_cleaned, gender_cleaned)], by="prenom", all.x = TRUE)
+prenom_gender_match <- merge(prenom_gender_match, thesis_table[,.(doc_id,date)], by="doc_id", all.x = TRUE)
+
+prenom_gender_match[is.na(gender_cleaned), gender_cleaned:="unk"]
+
+
+
+
+author_gender <- prenom_gender_match[role=="author"]
+supervisor_gender <- prenom_gender_match[role=="supervisor"]
+
+hist_author_gender <- author_gender[,.N,.(gender_cleaned,date)]
+hist_author_gender[,tot:=sum(N),date]
+hist_author_gender[,share:=N/tot]
+
+ggplot(data=hist_author_gender, aes(x=as.numeric(date), y=share, fill=gender_cleaned)) +
+  geom_bar(stat="identity")+
+  scale_fill_brewer(palette="Paired")+
+  theme_minimal()
+
+hist_supervisor_gender <- supervisor_gender[,.N,.(gender_cleaned,date)]
+hist_supervisor_gender[,tot:=sum(N),date]
+hist_supervisor_gender[,share:=N/tot]
+
+ggplot(data=hist_supervisor_gender, aes(x=as.numeric(date), y=share, fill=gender_cleaned)) +
+  geom_bar(stat="identity")+
+  scale_fill_brewer(palette="Paired")+
+  theme_minimal()
+
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+#### Gender table census ####
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+
+
+gender_gouv_table <- fread(here(FR_cleaned_data_path, "prenoms_genre_census.csv")) %>% as.data.table()
+gender_gouv_table[,First_Name_cleaned:=str_replace_all(preusuel, "[:punct:]","")] # remove all punctuation (we don't need dots anymore)
+gender_gouv_table[,First_Name_cleaned:=tolower(First_Name_cleaned)] 
+gender_gouv_table[,First_Name_cleaned:=stringi::stri_trans_general(First_Name_cleaned, "Latin-ASCII")] # remove accents, now we have some duplicate and possible diferences between previously differentiated prenom
+
+gender_gouv_table <- gender_gouv_table[,sum(nombre),.(First_Name_cleaned, sexe)]
+
+gender_gouv_table <- data.table::dcast(gender_gouv_table, First_Name_cleaned ~ sexe, value.var = "V1")
+gender_gouv_table[is.na(`1`), `1`:=0]
+gender_gouv_table[is.na(`2`), `2`:=0]
+
+gender_gouv_table[, n_name:=`1`+`2`]
+gender_gouv_table[, share_m:=`1`/n_name]
+gender_gouv_table[, share_f:=`2`/n_name]
+gender_gouv_table[share_m>=0.9, gender_cleaned:="M"]
+gender_gouv_table[share_f>=0.9, gender_cleaned:="F"]
+gender_gouv_table[is.na(gender_cleaned), gender_cleaned:="unk"]
+
+#people table
+people_table_name <- copy(people_table)
+people_table_name[,prenom:=str_replace_all(prenom, "[:punct:]","")] # remove all punctuation
+people_table_name[,prenom:=tolower(prenom)] 
+people_table_name[,prenom:=stringi::stri_trans_general(prenom, "Latin-ASCII")] 
+
+prenom_gender_match <- merge(people_table_name, gender_gouv_table[,list("prenom"=First_Name_cleaned, gender_cleaned)], by="prenom", all.x = TRUE)
+prenom_gender_match <- merge(prenom_gender_match, thesis_table[,.(doc_id,date)], by="doc_id", all.x = TRUE)
+
+prenom_gender_match[is.na(gender_cleaned), gender_cleaned:="unk"]
+
+
+
+
+author_gender <- prenom_gender_match[role=="author"]
+supervisor_gender <- prenom_gender_match[role=="supervisor"]
+
+hist_author_gender <- author_gender[,.N,.(gender_cleaned,date)]
+hist_author_gender[,tot:=sum(N),date]
+hist_author_gender[,share:=N/tot]
+
+ggplot(data=hist_author_gender[date>=1950], aes(x=as.numeric(date), y=share, fill=gender_cleaned)) +
+  geom_bar(stat="identity")+
+  scale_fill_brewer(palette="Dark2")+
+  theme_minimal() +
+  scale_x_continuous("Années de soutenance") +
+  scale_y_continuous("Genre auteurs de thèses")
+
+hist_supervisor_gender <- supervisor_gender[,.N,.(gender_cleaned,date)]
+hist_supervisor_gender[,tot:=sum(N),date]
+hist_supervisor_gender[,share:=N/tot]
+
+ggplot(data=hist_supervisor_gender[date>=1950], aes(x=as.numeric(date), y=share, fill=gender_cleaned)) +
+  geom_bar(stat="identity")+
+  scale_fill_brewer(palette="Dark2")+
+  theme_minimal() +
+  scale_x_continuous("Années de soutenance") +
+  scale_y_continuous("Genre directeurs de thèses")
+
+
+
+```

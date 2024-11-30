@@ -1,0 +1,69 @@
+---
+title: "To-do list"
+output: html
+date: "2024-07-20"
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+# Nettoyage
+
+## United-States
+
+### PDF-AEA
+
+- Améliorer le script pour placer une référence par ligne avant 1964.
+Le but était d'avoir un truc un peu meilleur pour identifier les noms, ce qui devait permettre de mieux identifier le début et la fin d'une ref.
+Je pense qu'on arrive à en identifier bien 95% entre 1904 et 1964, ce qui est pas mal, mais on peut faire mieux.
+- Continuer le script pour classer les informations d’une référence.
+Rien de compliqué mais assez laborieux.
+
+### Proquest (toujours d'actualité?)
+
+- Il faudra réfléchir aux filtres utilisés pour définir « thèse en économie ».
+Dans proquest, il y a trois niveau possibles qui peuvent aider à filtrer : « l’identifiant » (i.e. « Social Science »), la « classification » (i.e. « 0310: Business community »), et le « sujet » (i.e. « business »).
+- Sur google drive, j’ai télécharger toutes les thèses avec la classification « 0501: Economics ».
+Mais cela ne va pas inclure de manière systématique des domaines « à la frontière », type économie financière, économie agricole.
+- Une fois clean, il faudra regarder en détails le nombre d’abstract récupérer.
+
+## France
+
+- ERROR IN SCRIPT 4 FOR DUPLICATES: CHECK id "temp_sudoc_thesis_779833" is has no duplicates but IS the duplicates of two thesis. 
+- Finishing Script 7 on cleaning Edges (be careful with SUDOC/Theses.fr duplicates)
+- Cleaning further institutions
+- Adding geo data for locations (for maps)
+- Checking if further cleaning possible for persons.
+- Adding full text of theses (if possible)
+  - Identifying bibliography
+
+### Minor tasks
+
+- Harmonizing names of columns between the SUDOC scraping part and the cleaning part (to avoid changing names of column in the cleaning part). Small task but involves re-scraping all data. 
+- Harmonizing the code for cleaning SUDOC (using mostly tidyverse) and Thèse.fr (using data.table).
+
+
+
+### General
+
+-   Check language of title and abstract
+-   Clean problems in text
+    -   problems of apostrophe
+-   Rename variable in english (date_soutenance), value of role, etc.
+-   Résumé fr/en parfois inversés
+-   Comment gérer la multiplicité des colonnes? (directeur de thèses, etc...)
+-   Information contenu dans la variable other_type_info exploitable pour les institutions (pas besoin pour la date).
+-   duplicate: manage duplicate with the same title, author but a subtitle is different
+
+## UK
+
+- La base de données n’est pas clean du tout.
+Il faut vérifier d’où vient le problème (le fichier csv original ou l'exportation sur R qui foire).
+- Comme pour proquest et sudoc, il faudra se mettre d’accord sur une procédure pour définir une thèse comme appartenant à l’économie.
+La base de donnée UK regroupe sociologie, political science et économie sous la catégorie « Social, economic and political studies ».
+Il faudra filtrer nous-même à l’aide des titres/abstract ce qui relève de l’économie.
+
+# Nouvelles pistes.
+
+-   Réfléchir au scrapping de <https://academictree.org/> et de <https://genealogy.math.ndsu.nodak.edu/>
+-   Etendre à d'autres pays. Par priorité, je dirais: 1) Allemagne, 2) Pays-Bas, 3) Belgique, 4) Italie, 5) Canada, 6) Australie, 7) Espagne (et après bon bah on verra).
