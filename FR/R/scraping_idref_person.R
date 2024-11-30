@@ -6,11 +6,11 @@
 #' extractions, performs progressive saving, and augments the data with additional country information 
 #' when applicable.
 #' 
-#' This script must be run after the `scripts/cleaning_scripts/FR/3_FR_merging_database.R` script, to 
+#' This script must be run after the `/FR/R/merging_sudoc_thesesfr.R` script, to 
 #' import individuals idref.
 #' 
 #' The extracted data will support the standardization of individuals names and relationships 
-#' in downstream processing (see `/scripts/cleaning_scripts/FR/FR_cleaning_persons.R`).
+#' in downstream processing (see `/FR/R/cleaning_persons.R`).
 
 
 # Loading data and packages-----

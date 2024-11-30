@@ -7,11 +7,11 @@
 #' - Dates of activity
 #' - Country information
 #' 
-#' This script must be run after the `scripts/cleaning_scripts/FR/3_FR_merging_database.R` script, to 
+#' This script must be run after the `/FR/merging_sudoc_thesesfr.R` script, to 
 #' import institutions idref.
 #'
 #' The extracted data will support the standardization of institution names and relationships 
-#' in downstream processing (see `/scripts/cleaning_scripts/FR/FR_cleaning_institutions.R`).
+#' in downstream processing (see `/FR/R/cleaning_institutions.R`).
 
 # Load Required Libraries and Scripts ------------------------------------------------
 pacman::p_load(here, httr, progress, xml2, glue, tibble, purrr, data.table, dplyr)

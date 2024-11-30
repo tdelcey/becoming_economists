@@ -21,6 +21,8 @@ execute:
  echo: false
  warning: false
  message: false
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -49,7 +51,6 @@ Our database is also under an open licence (**WHICH ONE**). It can be accessed a
 
 If you use our data or our scripts, please cite us using the following bib reference:
 
-
 ```{bibtex}
 #| echo: true
 
@@ -60,7 +61,6 @@ If you use our data or our scripts, please cite us using the following bib refer
   year={2024}
 }
 ```
-
 
 ::: {.callout-warning}
 Be careful to the fact that some of our cleaning steps are the result of the specificities of the data we have extracted. We have checked systematically problems in our data and proceeded to manual cleaning (whether to remove some problematic titles, identify duplicates, clean institutions, etc.). If you are using our code to extract data, you should be careful to check the quality of the data you have extracted and to adapt the cleaning steps to your data. Don’t hesitate to ask us for guidance if you are using our code to extract similar data.
@@ -74,7 +74,7 @@ Be careful to the fact that some of our cleaning steps are the result of the spe
 ```{r}
 #| echo: FALSE
 
-thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.RDS")) %>% ungroup
+thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.RDS"))
 
 p_load(DT, 
        plotly)
@@ -518,24 +518,24 @@ digraph project_dag {
  graph [layout = dot, rankdir = TB]
  
  # Define nodes
- scraping_sudocc_id [label = 'scraping_sudoc_id.R', shape = box, style = filled, fillcolor = lightblue]
+ scraping_sudoc_id [label = 'scraping_sudoc_id.R', shape = box, style = filled, fillcolor = lightblue]
  scraping_sudoc_api [label = 'scraping_sudoc_api.R', shape = box, style = filled, fillcolor = lightblue]
- cleaning_SUDoc[label = '1_FR_sudoc_cleaning.R', shape = box, style = filled, fillcolor = lightyellow]
+ cleaning_sudoc [label = 'cleaning_sudoc.R', shape = box, style = filled, fillcolor = lightyellow]
  downloading_theses_fr [label = 'downloading_theses_fr.R', shape = box, style = filled, fillcolor = lightblue]
- cleaning_thesesfr [label = '2_FR_thesesfr_cleaning.R', shape = box, style = filled, fillcolor = lightyellow]
- merging_database [label = '3_FR_merging_database.R', shape = box, style = filled, fillcolor = lightyellow]
+ cleaning_thesesfr [label = 'cleaning_thesesfr.R', shape = box, style = filled, fillcolor = lightyellow]
+ merging_database [label = 'merging_sudoc_thesesfr.R', shape = box, style = filled, fillcolor = lightyellow]
  idref_institutions [label = 'scraping_idref_institution.R', shape = box, style = filled, fillcolor = lightblue]
  idref_persons [label = 'scraping_idref_person.R', shape = box, style = filled, fillcolor = lightblue]
- cleaning_metadata [label = '4_FR_cleaning_thesis_metada.R', shape = box, style = filled, fillcolor = lightyellow]
- cleaning_institutions [label = '5_FR_cleaning_institutions.R', shape = box, style = filled, fillcolor = lightyellow]
- cleaning_persons [label = '6_FR_cleaning_persons.R', shape = box, style = filled, fillcolor = lightyellow]
- cleaning_edges [label = '7_FR_cleaning_edges.R', shape = box, style = filled, fillcolor = lightyellow]
+ cleaning_metadata [label = 'cleaning_thesis_metada.R', shape = box, style = filled, fillcolor = lightyellow]
+ cleaning_institutions [label = 'cleaning_institutions.R', shape = box, style = filled, fillcolor = lightyellow]
+ cleaning_persons [label = 'cleaning_persons.R', shape = box, style = filled, fillcolor = lightyellow]
+ cleaning_edges [label = 'cleaning_edges.R', shape = box, style = filled, fillcolor = lightyellow]
  
  # Define edges
  scraping_sudoc_id -> scraping_sudoc_api
  scraping_sudoc_api -> cleaning_sudoc 
  downloading_theses_fr -> cleaning_thesesfr
- cleaning_sudoc-> merging_database
+ cleaning_sudoc -> merging_database
  cleaning_thesesfr -> merging_database
  merging_database -> idref_institutions
  merging_database -> idref_persons
@@ -550,7 +550,7 @@ digraph project_dag {
 
 ```
 
-## Scrapping 
+## Scraping 
 
 The data used in this project comes from three mains sources: 
 
