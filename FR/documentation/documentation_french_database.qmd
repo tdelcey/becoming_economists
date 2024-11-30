@@ -518,18 +518,18 @@ digraph project_dag {
  graph [layout = dot, rankdir = TB]
  
  # Define nodes
- scraping_sudoc_id [label = 'scraping_sudoc_id.R', shape = box, style = filled, fillcolor = lightblue]
- scraping_sudoc_api [label = 'scraping_sudoc_api.R', shape = box, style = filled, fillcolor = lightblue]
- cleaning_sudoc [label = 'cleaning_sudoc.R', shape = box, style = filled, fillcolor = lightyellow]
- downloading_theses_fr [label = 'downloading_theses_fr.R', shape = box, style = filled, fillcolor = lightblue]
- cleaning_thesesfr [label = 'cleaning_thesesfr.R', shape = box, style = filled, fillcolor = lightyellow]
- merging_database [label = 'merging_sudoc_thesesfr.R', shape = box, style = filled, fillcolor = lightyellow]
- idref_institutions [label = 'scraping_idref_institution.R', shape = box, style = filled, fillcolor = lightblue]
- idref_persons [label = 'scraping_idref_person.R', shape = box, style = filled, fillcolor = lightblue]
- cleaning_metadata [label = 'cleaning_thesis_metada.R', shape = box, style = filled, fillcolor = lightyellow]
- cleaning_institutions [label = 'cleaning_institutions.R', shape = box, style = filled, fillcolor = lightyellow]
- cleaning_persons [label = 'cleaning_persons.R', shape = box, style = filled, fillcolor = lightyellow]
- cleaning_edges [label = 'cleaning_edges.R', shape = box, style = filled, fillcolor = lightyellow]
+ scraping_sudoc_id [label = 'scraping_sudoc_id.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_sudoc_id.R']
+ scraping_sudoc_api [label = 'scraping_sudoc_api.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_sudoc_api.R']
+ cleaning_sudoc [label = 'cleaning_sudoc.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_sudoc.R']
+ downloading_theses_fr [label = 'downloading_theses_fr.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/downloading_theses_fr.R']
+ cleaning_thesesfr [label = 'cleaning_thesesfr.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_thesesfr.R']
+ merging_database [label = 'merging_sudoc_thesesfr.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/merging_sudoc_thesesfr.R']
+ idref_institutions [label = 'scraping_idref_institution.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_idref_institution.R']
+ idref_persons [label = 'scraping_idref_person.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_idref_person.R']
+ cleaning_metadata [label = 'cleaning_thesis_metada.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_thesis_metada.R']
+ cleaning_institutions [label = 'cleaning_institutions.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_institutions.R']
+ cleaning_persons [label = 'cleaning_persons.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_persons.R']
+ cleaning_edges [label = 'cleaning_edges.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_edges.R']
  
  # Define edges
  scraping_sudoc_id -> scraping_sudoc_api
