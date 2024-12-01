@@ -93,7 +93,7 @@ gender_frequency[, gender_expanded := fifelse(gender_expanded == 1, "male", "fem
 # Match names from `thesis_person` with `gender_frequency`
 thesis_person[is.na(gender), name_match := str_to_upper(entity_firstname)] # Uppercase to harmonize with INSEE data
 thesis_person[, name_match := str_replace_all(name_match, "[:punct:]", " ")] 
-thesis_person[, name_match := str_remove(name_match, "^[A-Z](\\.)?\\s")] # Remove initials
+thesis_person[, name_match := str_remove(name_match, "^[A-Z](\\.)?\\s|\\sd(e|')?$")] # Remove initials or remove particule at the end
 thesis_person[, name_match := str_extract(name_match, "^[^ ]+")] # Extract first first name
 thesis_person[, name_match := str_squish(name_match)]
 
@@ -107,6 +107,11 @@ thesis_person <- merge(
 
 # Update `gender_expanded` for rows where `gender` is missing
 thesis_person[, gender_expanded := fifelse(is.na(gender_expanded), gender, gender_expanded)]
+
+# Last cleaning steps ---------------------------------------------------------
+# Standardizing the names and first names
+thesis_person[, entity_name := str_to_title(entity_name)]
+thesis_person[, entity_firstname := str_to_title(entity_firstname)]
 
 # Save the Cleaned Data -------------------------------------------------------
 thesis_person <- thesis_person[, .(entity_firstname, entity_id, entity_name, gender, gender_expanded,
