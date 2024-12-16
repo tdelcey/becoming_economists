@@ -1,14 +1,23 @@
-# Load packages and data-----
+#################### Cleaning the data linking theses and entities ####################
 
+#' Purpose: This script 
+
+
+# Load packages and data--------------------------------------------------------
 source(file.path("paths_and_packages.R"))
+p_load(tidyfast)
 
-thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.rds")) %>% as_tibble()
-thesis_person <- readRDS(here(FR_cleaned_data_path, "thesis_person.rds")) %>% as_tibble()
-thesis_institution <- readRDS(here(FR_cleaned_data_path, "thesis_institution.rds")) %>% as_tibble()
-thesis_edge <- readRDS(here(FR_intermediate_data_path, "thesis_edge.rds")) %>% as_tibble()
-
+thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.rds"))
+thesis_person <- readRDS(here(FR_cleaned_data_path, "thesis_person.rds"))
+thesis_institution <- readRDS(here(FR_cleaned_data_path, "thesis_institution.rds"))
+thesis_edge <- readRDS(here(FR_intermediate_data_path, "thesis_edge.rds"))
 
 # update institution edges (merge by old_id) 
+
+new_ids <- thesis_institution[! is.na(old_id), .(new_id = entity_id, old_id = old_id)] %>% 
+  dt_unnest(old_id, keep = FALSE)
+
+new_ids[thesis_edge, on = .(V1 = entity_id),][, entity_id := fifelse(is.na(new_id), V1, new_id)]
 
 institution_edges <- thesis_institution %>% 
   # unnest to prepare matching 
