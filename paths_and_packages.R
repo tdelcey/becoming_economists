@@ -15,20 +15,26 @@ for (p in package_list) {
   library(p, character.only = TRUE)
 }
 
+# Number of threads used with data.table in percentage of total CPU
+setDTthreads(percent = 70)
+
 #### PATH ####
 
 #original text path stored in google drive 
 if(str_detect(getwd(), "tunex")){
-  data_path <- "G:/Mon Drive/Phd_Project/data"
+  data_path <- file.path(path.expand("~"), "google_drive/Mon Drive/Phd_Project/data")
 } else {
   if(str_detect(getwd(), "Admin")) {
     data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
   } else {
-  if(str_detect(getwd(), "thomd")) {
-    data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
-    } else {
+    if(str_detect(getwd(), "thomd")) {
       data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
-    }}
+    } else {
+      if(str_detect(getwd(), "agoutsmedt")) {
+        data_path <- "/home/agoutsmedt/google_drive/Phd_Project/data"
+      } else {
+        data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
+      }}}
     print(paste("The path for data is", data_path))
   }
 
