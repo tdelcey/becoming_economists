@@ -68,9 +68,9 @@ persons_edge <- merge.data.table(persons_edge,
 thesis_edge <- bind_rows(institutions_edge, persons_edge) 
 
 # Save the complete edge table with all original information for validation
-saveRDS(thesis_edge[, .(these_id, entity_id, original_id, entity_role, entity_name, entity_firstname, original_entity_name, original_entity_firstname, source)], 
+saveRDS(thesis_edge[, .(thesis_id, entity_id, original_id, entity_role, entity_name, entity_firstname, original_entity_name, original_entity_firstname, source)], 
         here(FR_cleaned_data_path, "thesis_edge_complete_data.rds"))
 
 # This is the short usable version, with no duplicates
-saveRDS(thesis_edge[, .(these_id, entity_id, entity_role, entity_name, entity_firstname)] %>% unique(),
+saveRDS(thesis_edge[, .(thesis_id, entity_id, entity_role, entity_name, entity_firstname)] %>% unique(),
         here(FR_cleaned_data_path, "thesis_edge.rds"))

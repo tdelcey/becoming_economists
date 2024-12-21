@@ -68,8 +68,3 @@ FR_sudoc_raw_data_path <- here(FR_raw_data_path, "sudoc")
 FR_sudoc_intermediate_data_path <- here(FR_intermediate_data_path, "sudoc")
 
 FR_cleaned_data_path <- here(data_path, "cleaned_data/FR")
-
-# Why saving this in the data file?? It should be in the project repo no?
-# figures_path <- here(data_path, "figures")
-
-

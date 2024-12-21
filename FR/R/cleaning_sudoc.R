@@ -232,16 +232,16 @@ data <- data %>%
 #' - sudoc_institution: the table with information about institutions linked to the theses (laboratories, universities, etc.)
 
 data <- data %>%
-  rename(these_id = nnt) %>% 
+  rename(thesis_id = nnt) %>% 
   mutate(accessible = NA, # for conformity with theses.fr
          country = "France",
-         these_id = ifelse(is.na(these_id), paste0("temp_sudoc_thesis_", sample(100000:999999, nrow(.))), these_id))
+         thesis_id = ifelse(is.na(thesis_id), paste0("temp_sudoc_thesis_", sample(100000:999999, nrow(.))), thesis_id))
 
 ## Select and save metadata variables ------------
 
 sudoc_metadata <- data %>%
   select(
-    these_id,
+    thesis_id,
     url,
     year_defence,
     title_fr,
@@ -256,14 +256,14 @@ sudoc_metadata <- data %>%
     accessible
   )
 
-saveRDS(sudoc_metadata, here(FR_sudoc_intermediate_data_path, "sudoc_metadata.RDS"))
+saveRDS(sudoc_metadata, here(FR_sudoc_intermediate_data_path, "sudoc_metadata.rds"))
 
 ## Creating Edge Table--------
 
 #' One important step here is to create an id for each entity (individual or institution) that is not identified by an idref.
 #' We will differentiate them by a prefix "temp_sudoc_person_" or "temp_sudoc_institution_" followed by a random number. 
 sudoc_edge <- data %>% 
-  select(these_id,
+  select(thesis_id,
          author_idref,
          author_name,
          author_firstname,
@@ -288,11 +288,11 @@ sudoc_edge <- data %>%
          laboratory_idref,
          research_partner_name,
          research_partner_idref) %>% 
-  mutate(across(! where(is.list) & !starts_with("these_id"), ~as.list(.))) %>% # necessary for all information to fit in the same columns
-  pivot_longer(cols = -these_id, names_to = "variable", values_to = "value") %>% # linking thesis and institutions/intdividuals
+  mutate(across(! where(is.list) & !starts_with("thesis_id"), ~as.list(.))) %>% # necessary for all information to fit in the same columns
+  pivot_longer(cols = -thesis_id, names_to = "variable", values_to = "value") %>% # linking thesis and institutions/intdividuals
   unnest(value)  %>% 
   separate(variable, into = c("role", "info"), sep = "_(?=[^_]+$)") %>% # extracting the role after the last "_"
-  mutate(order = 1:n(), .by = c(these_id, role, info)) %>% # necessary to avoid list columns in pivot_wider
+  mutate(order = 1:n(), .by = c(thesis_id, role, info)) %>% # necessary to avoid list columns in pivot_wider
   pivot_wider(names_from = info, values_from = value) %>% 
   filter(! (is.na(name) & is.na(idref))) %>% # removing missing information
   rename(entity_role = role,
@@ -311,7 +311,7 @@ sudoc_edge <- data %>%
 sudoc_edge <- sudoc_edge %>% 
   mutate(source = "sudoc")
 
-saveRDS(sudoc_edge, here(FR_sudoc_intermediate_data_path, "sudoc_edge.RDS"))
+saveRDS(sudoc_edge, here(FR_sudoc_intermediate_data_path, "sudoc_edge.rds"))
 
 ## Person table ------
 

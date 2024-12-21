@@ -23,12 +23,12 @@ idref_institutions <- readRDS(here(FR_raw_data_path, "idref", "idref_institution
 
 # Load edge and metadata tables to get the defence year
 thesis_edge <- readRDS(here(FR_intermediate_data_path, "thesis_edge.rds")) 
-thesis_metadata <- readRDS(here(FR_intermediate_data_path, "thesis_metadata.rds")) 
+thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.rds")) 
 
 # Filter, join, and select relevant data ---------------------------------------
-# Select institutions with temporary IDs and join with these_id and year_defence
-thesis_institutions_with_date <- merge(thesis_institutions[entity_id %like% "temp"], thesis_edge[, .(these_id, entity_id)], by = "entity_id", all.x = TRUE)  # Join to add `these_id`
-thesis_institutions_with_date <- merge(thesis_institutions_with_date, thesis_metadata[, .(these_id, year_defence)], by = "these_id", all.x = TRUE)  # Join to add `year_defence`
+# Select institutions with temporary IDs and join with thesis_id and year_defence
+thesis_institutions_with_date <- merge(thesis_institutions[entity_id %like% "temp"], thesis_edge[, .(thesis_id, entity_id)], by = "entity_id", all.x = TRUE)  # Join to add `thesis_id`
+thesis_institutions_with_date <- merge(thesis_institutions_with_date, thesis_metadata[, .(thesis_id, year_defence)], by = "thesis_id", all.x = TRUE)  # Join to add `year_defence`
 thesis_institutions_with_date <- thesis_institutions_with_date[! is.na(year_defence)]
 
 # Define manual regex-based matching rules -------------------------------------

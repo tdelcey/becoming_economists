@@ -16,7 +16,7 @@ thesesfr_metadata <- readRDS(here(FR_thesefr_intermediate_data_path, "thesesfr_m
 
 # Combine and deduplicate metadata
 thesis_metadata <- bind_rows(thesesfr_metadata, sudoc_metadata) %>% 
-  distinct(these_id, .keep_all = TRUE)
+  distinct(thesis_id, .keep_all = TRUE)
 
 # Merge Edge Data ------------------------------------------------------------
 # Load edge tables from SUDOC and Theses.fr

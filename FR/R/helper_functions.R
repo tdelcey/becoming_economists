@@ -99,7 +99,7 @@ fetch_text_by_tags_and_codes <- function(page, tags, codes, give_list = FALSE) {
 #' @param threads Integer. The number of threads to use for processing. Parameter from fastText `language_identification` function.
 #' @param verbose Logical. If TRUE, print progress information. Parameter from fastText `language_identification` function.
 #'
-#' @return A data.table with three columns: `language_fastText`, `prob_fastText`, and `these_id`.
+#' @return A data.table with three columns: `language_fastText`, `prob_fastText`, and `thesis_id`.
 #' @importFrom data.table data.table setnames
 #' @examples
 #' # Example usage:
@@ -126,11 +126,11 @@ identify_fastText_language <- function(input_obj, id_obj, pre_trained_language_m
   ) %>% 
     as.data.table()
   
-  # Add `these_id` from thesis_metadata
-  language_fastText[, these_id := id_obj]
+  # Add `thesis_id` from thesis_metadata
+  language_fastText[, thesis_id := id_obj]
   
   # Rename columns
-  setnames(language_fastText, c("language_fastText", "prob_fastText", "these_id"))
+  setnames(language_fastText, c("language_fastText", "prob_fastText", "thesis_id"))
   
   return(language_fastText)
 }
@@ -144,15 +144,15 @@ identify_fastText_language <- function(input_obj, id_obj, pre_trained_language_m
 #' @param data_dt A `data.table` containing the thesis metadata, with at least three columns: 
 #'   - `authors`: Normalized author names used for grouping.
 #'   - `title`: Normalized thesis titles.
-#'   - `these_id`: Unique identifiers for each thesis.
+#'   - `thesis_id`: Unique identifiers for each thesis.
 #' @param threshold_distance Numeric. The maximum absolute string distance between two titles for them 
 #'   to be considered duplicates.
 #' @param threshold_normalization Numeric. The maximum normalized string distance (distance divided by
 #'   the product of the title lengths) for two titles to be considered duplicates.
 #'
 #' @return A `data.table` containing the following columns:
-#'   - `these_id`: The identifier for the primary thesis in the duplicate group.
-#'   - `these_id_2`: The identifier for the duplicate thesis.
+#'   - `thesis_id`: The identifier for the primary thesis in the duplicate group.
+#'   - `thesis_id_2`: The identifier for the duplicate thesis.
 #'   - `authors`: The author associated with the duplicates.
 #'   - `text1`: The first title in the comparison.
 #'   - `text2`: The second title in the comparison.
@@ -171,7 +171,7 @@ identify_fastText_language <- function(input_obj, id_obj, pre_trained_language_m
 #' data_dt <- data.table(
 #'   authors = c("smith john", "smith john", "doe jane"),
 #'   title = c("My Thesis Title", "My Thesis Titel", "Another Thesis"),
-#'   these_id = c("ID1", "ID2", "ID3")
+#'   thesis_id = c("ID1", "ID2", "ID3")
 #' )
 #'
 #' # Detect duplicates with specific thresholds
@@ -181,7 +181,7 @@ identify_fastText_language <- function(input_obj, id_obj, pre_trained_language_m
 find_duplicates <- function(data_dt, threshold_distance, threshold_normalization, workers) {
  
    # Group data by authors to avoid unnecessary comparisons
-  data_dt <- data_dt[, .(titles = list(title), ids = list(these_id)), by = authors]
+  data_dt <- data_dt[, .(titles = list(title), ids = list(thesis_id)), by = authors]
   data_dt <- data_dt[lengths(titles) > 1]  # Keep only groups with more than one title for safety (should not be necessary if data is clean)
   
   # Define a helper function for processing a single group
@@ -200,9 +200,9 @@ find_duplicates <- function(data_dt, threshold_distance, threshold_normalization
       
       title_match <- comparison %>%
         as.data.table() %>%
-        merge(data.table(title1 = titles, these_id_1 = ids), by.x = "text1", by.y = "title1", allow.cartesian = TRUE) %>%
-        merge(data.table(title2 = titles, these_id_2 = ids), by.x = "text2", by.y = "title2", allow.cartesian = TRUE) %>%
-        .[these_id_1 != these_id_2, .(these_id_1, these_id_2, authors, text1, text2, distance, normalized_distance)]
+        merge(data.table(title1 = titles, thesis_id_1 = ids), by.x = "text1", by.y = "title1", allow.cartesian = TRUE) %>%
+        merge(data.table(title2 = titles, thesis_id_2 = ids), by.x = "text2", by.y = "title2", allow.cartesian = TRUE) %>%
+        .[thesis_id_1 != thesis_id_2, .(thesis_id_1, thesis_id_2, authors, text1, text2, distance, normalized_distance)]
       
       return(title_match)
     }
@@ -226,9 +226,9 @@ find_duplicates <- function(data_dt, threshold_distance, threshold_normalization
   if(length(results) > 0) {
     results <- results %>% 
       rbindlist()
-    setkey(results, key = these_id_1)
+    setkey(results, key = thesis_id_1)
     duplicates <- results[normalized_distance < threshold_normalization & distance < threshold_distance, ]
-    setnames(duplicates, "these_id_1", "these_id")
+    setnames(duplicates, "thesis_id_1", "thesis_id")
     duplicates <- unique(duplicates)
     
     return(duplicates)
@@ -243,8 +243,8 @@ find_duplicates <- function(data_dt, threshold_distance, threshold_normalization
 #' pattern in the titles. It assigns a consistent ID to all theses whose titles match the pattern.
 #'
 #' @param data A `data.frame` or `data.table` containing thesis metadata, including a column for titles
-#'   (e.g., `title_fr`) and unique IDs (e.g., `these_id`).
-#' @param id_ref The column to use as the reference for assigning duplicate IDs (e.g., `these_id`).
+#'   (e.g., `title_fr`) and unique IDs (e.g., `thesis_id`).
+#' @param id_ref The column to use as the reference for assigning duplicate IDs (e.g., `thesis_id`).
 #' @param pattern A string or regular expression to match titles that are considered duplicates.
 #'
 #' @return A `data.frame` or `data.table` with an additional column `id_new`:
@@ -260,7 +260,7 @@ find_duplicates <- function(data_dt, threshold_distance, threshold_normalization
 #' @examples
 #' # Example dataset
 #' thesis_metadata <- data.table(
-#'   these_id = c("ID1", "ID2", "ID3"),
+#'   thesis_id = c("ID1", "ID2", "ID3"),
 #'   title_fr = c("Approche systémique et régulation économique", 
 #'                "Approche systémique et régulation économique", 
 #'                "Another Title")
@@ -269,7 +269,7 @@ find_duplicates <- function(data_dt, threshold_distance, threshold_normalization
 #' # Match duplicates manually using a specific title pattern
 #' matching_duplicate_manually(
 #'   data = thesis_metadata, 
-#'   id_ref = these_id, 
+#'   id_ref = thesis_id, 
 #'   pattern = "Approche systémique et régulation économique"
 #' )
 #'

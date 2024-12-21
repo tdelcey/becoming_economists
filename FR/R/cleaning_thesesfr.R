@@ -7,7 +7,6 @@ source(file.path("paths_and_packages.R"))
 full_raw_theses <- read_rds(here(FR_raw_data_path, "theses.fr", "data_theses_fr.rds")) %>% 
   as.data.table()
 
-full_raw_theses[auteur.nom %like% "Alayrac"] %>% View()
 # Filtering economics-----------
 #' Filter the dataset to include only theses related to economics.
 #' This filtering is based on keywords like "econom" and "économ" found in the `discipline` column.
@@ -75,7 +74,7 @@ raw_theses[, `:=` (langues.1 = ifelse(str_count(langues.0) > 2, str_sub(langues.
 ## Thesis metadata table--------
 #' Create a metadata table containing key information about each thesis.
 
-thesesfr_metadata <- raw_theses[, .(these_id = nnt,
+thesesfr_metadata <- raw_theses[, .(thesis_id = nnt,
                                     year_defence = date_soutenance,
                                     language = langues.0,
                                     language_2 = langues.1,
@@ -91,10 +90,10 @@ thesesfr_metadata <- raw_theses[, .(these_id = nnt,
 #' Add additional fields for consistency with other datasets (e.g., SUDOC).
 thesesfr_metadata[, `:=` (type = "Thèse", 
                           country = "France", # Default country
-                          url = paste0("https://theses.fr/", these_id))] # creating the url to connect directly to theses.fr
+                          url = paste0("https://theses.fr/", thesis_id))] # creating the url to connect directly to theses.fr
 
 # Save the metadata table
-saveRDS(thesesfr_metadata, here(FR_thesefr_intermediate_data_path, "thesesfr_metadata.RDS"))
+saveRDS(thesesfr_metadata, here(FR_thesefr_intermediate_data_path, "thesesfr_metadata.rds"))
 
 ## Creating Edge Table--------
 #' Create an edge table to capture relationships between theses and associated entities (individuals and institutions).
@@ -126,7 +125,7 @@ edge_table_temp[is.na(idref) & str_detect(role, "etablissements|ecoles|partenair
 # Rename columns for consistency and save the edge table
 setnames(edge_table_temp, 
          c("nnt", "role", "idref", "nom", "prenom"), 
-         c("these_id", "entity_role", "entity_id", "entity_name", "entity_firstname"))
+         c("thesis_id", "entity_role", "entity_id", "entity_name", "entity_firstname"))
 
 # Rename role for consistency
 edge_table_temp[, entity_role := str_replace(entity_role, "auteur", "author")]
@@ -141,16 +140,16 @@ edge_table_temp[, entity_role := str_replace(entity_role, "partenaires_recherche
 # We add a source file necessary to clean doublons later
 edge_table_temp[, source := "thesesfr"]
 
-saveRDS(edge_table_temp, here(FR_thesefr_intermediate_data_path, "thesesfr_edge.RDS"))
+saveRDS(edge_table_temp, here(FR_thesefr_intermediate_data_path, "thesesfr_edge.rds"))
 
 ## Creating Person Table-----------
 thesesfr_person <- edge_table_temp[str_detect(entity_role, "author|member|supervisor|reviewer|president")]
-thesesfr_person <- thesesfr_person[, `:=` (these_id = NULL, entity_role = NULL)] %>%
+thesesfr_person <- thesesfr_person[, `:=` (thesis_id = NULL, entity_role = NULL)] %>%
   unique()
 saveRDS(thesesfr_person, here(FR_thesefr_intermediate_data_path, "thesesfr_person.rds"))
 
 ## Creating Institution Table-----------
 thesesfr_institution <- edge_table_temp[str_detect(entity_role, "institution|school|partner|laboratory")]
-thesesfr_institution <- thesesfr_institution[, `:=` (these_id = NULL, entity_role = NULL, entity_firstname = NULL)] %>%
+thesesfr_institution <- thesesfr_institution[, `:=` (thesis_id = NULL, entity_role = NULL, entity_firstname = NULL)] %>%
   unique()
 saveRDS(thesesfr_institution, here(FR_thesefr_intermediate_data_path, "thesesfr_institution.rds"))
