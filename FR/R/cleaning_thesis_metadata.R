@@ -318,6 +318,9 @@ duplicates <- find_duplicates(data_to_match,
 duplicates <- duplicates[normalized_distance < 0.0051 | (distance < 51 & normalized_distance < 0.00622)]
 
 # Group duplicates by primary ID
+duplicates <- rbind(duplicates[, .(thesis_id, thesis_id_2)],
+                        duplicates[, .(thesis_id = thesis_id_2, thesis_id_2 = thesis_id)]) %>% 
+  unique()
 duplicates <- duplicates[, .(duplicates = list(thesis_id_2)), by = "thesis_id"]
 
 # Add duplicates to the main metadata table
@@ -327,24 +330,25 @@ thesis_metadata <- thesis_metadata %>%
 
 ## Handling specific cases-----------------------------------------------------
 
-#' matching_duplicate_manually() identifies and matches potential duplicates in thesis metadata based on a given 
-#' pattern in the titles. It assigns a consistent ID to all theses whose titles match the pattern.
+# Group together id with the same pattern
+specific_cases <- thesis_metadata[title_fr %like% "Approche systémique et régulation économique",]
+thesis_metadata[title_fr %like% "Approche systémique et régulation économique", duplicates := map(thesis_id, ~ setdiff(specific_cases$thesis_id, .x))]
 
-# handle specific case
-specific_cases <- thesis_metadata %>%
-  arrange(thesis_id) %>%
-  matching_duplicate_manually(thesis_id, pattern = "Approche systémique et régulation économique") %>%
-  select(contains("id")) %>%
-  group_by(id_new) %>%
-  mutate(duplicates = list(thesis_id),
-         duplicates = map(duplicates, ~.[-1])) %>% # remove the first element of the list, the id of the line 
-  ungroup %>%
-  select(thesis_id, duplicates) %>%
-  unique
+## Checking the right number of duplicates----------------------------------------
+# We unnest the duplicates and we check that each id is present the same number of 
+# times on both sides.
 
-# Add specific cases to metadata
-thesis_metadata <- thesis_metadata %>%
-  mutate(duplicates = ifelse(thesis_id %in% specific_cases$thesis_id, specific_cases$duplicates, duplicates))
+test_dt <- copy(thesis_metadata)
+test_dt <- dt_unnest(test_dt, duplicates, keep = FALSE) %>% 
+  .[!is.na(V1), .(thesis_id, V1)]
+test_dt[, n_thesis := .N, by = thesis_id]
+test_dt[, n_duplicates := .N, by = V1]
+
+if(nrow(test_dt[n_duplicates != n_thesis]) == 0) {
+  cli_alert_success("All duplicates have been correctly assigned.")
+} else {
+  cli_alert_danger("Some duplicates have not been correctly assigned.")
+}
 
 # Saving final results
 saveRDS(thesis_metadata, here(FR_cleaned_data_path, "thesis_metadata.rds"))

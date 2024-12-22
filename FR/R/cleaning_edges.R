@@ -66,6 +66,7 @@ persons_edge <- merge.data.table(persons_edge,
 # Saving the final edge tables--------------------------------
 # Combine cleaned edges for institutions and persons
 thesis_edge <- bind_rows(institutions_edge, persons_edge) 
+setorder(thesis_edge, thesis_id, entity_role, entity_id)
 
 # Save the complete edge table with all original information for validation
 saveRDS(thesis_edge[, .(thesis_id, entity_id, original_id, entity_role, entity_name, entity_firstname, original_entity_name, original_entity_firstname, source)], 

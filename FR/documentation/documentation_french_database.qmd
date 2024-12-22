@@ -6,7 +6,7 @@ author:
     email: "Thomas.delcey@u-bourgogne.fr"
   - name: "Aurelien Goutsmedt"
     affiliation: "UC Louvain; ICHEC"
-    email: "" 
+    email: "aurelien.goutsmedt@uclouvain.be" 
 format: 
   gfm: default
   html: default
@@ -47,18 +47,20 @@ This database gathers information on Ph.D. in economics defended in France since
 
 ## Usage and Access
 
-Our database is also under an open licence (**WHICH ONE**). It can be accessed and used freely by anyone. The data is stored in the [XXX repository](https://osf.io/). Note that we focus on Ph.D. in economics and we queries our sources by the field of the thesis. However, the scipts have been developped with a relative flexibility and can be adapted to other queries, for instance, for other disciplines.
+Our database is also under the [CC-BY-4.0 licence](https://creativecommons.org/licenses/by/4.0/). It can be accessed and used freely by anyone. The data is stored in a [Zenodo repository](https://doi.org/10.5281/zenodo.14541427). Note that we focus on Ph.D. in economics and we queries our sources by the field of the thesis. However, the scripts have been developed with a relative flexibility and can be adapted to other queries, for instance, for other disciplines.
 
-If you use our data or our scripts, please cite us using the following bib reference:
+If you use our data or our scripts, please cite us as 
+Delcey Thomas, and Aurélien Goutsmedt. (2024). Becoming an Economist: A Database of French Economics PhDs. Zenodo. (https://doi.org/10.5281/zenodo.14541427).
 
 ```{bibtex}
 #| echo: true
 
-@article{delcey2022becoming,
+@article{
   title={Becoming an Economist: A Database of French Economics PhDs},
-  author={Goutsmedt, Aurelien, Delcey, Thomas},
-  journal={Working Paper},
-  year={2024}
+  author={Delcey, Thomas and Goutsmedt, Aurélien},
+  journal={Zenodo},
+  year={2024},
+  doi={https://doi.org/10.5281/zenodo.14541427}
 }
 ```
 
@@ -74,7 +76,7 @@ Be careful to the fact that some of our cleaning steps are the result of the spe
 ```{r}
 #| echo: FALSE
 
-thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.RDS"))
+thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.rds"))
 
 p_load(DT, 
        plotly)
@@ -451,14 +453,14 @@ thesis_person %>%
 
 
 p <- thesis_person %>%
-  mutate(gender_expended = ifelse(is.na(gender_expended), "Unknown", gender_expended)) %>% 
+  mutate(gender_expanded = ifelse(is.na(gender_expanded), "Unknown", gender_expanded)) %>% 
   mutate(total = n()) %>% 
-  add_count(gender_expended) %>% 
+  add_count(gender_expanded) %>% 
   reframe(percentage = n/total*100,
-          tooltip = glue::glue("Gender: {gender_expended} <br> Number of theses: {n} <br> % : {round(percentage, 2)}"),
-          gender_expended) %>%
+          tooltip = glue::glue("Gender: {gender_expanded} <br> Number of theses: {n} <br> % : {round(percentage, 2)}"),
+          gender_expanded) %>%
   unique %>% 
-  ggplot(aes(x = gender_expended, y = percentage, text = tooltip)) +
+  ggplot(aes(x = gender_expanded, y = percentage, text = tooltip)) +
   geom_col(fill = "skyblue") +
   labs(y = "") + 
   theme_minimal() 
@@ -658,7 +660,7 @@ The [4_FR_cleaning_thesis_metadata.R](/scripts/cleaning_scripts/FR/4_FR_cleaning
 
 thesis_metadata %>% 
   filter(!is.na(duplicates)) %>% 
-  filter(these_id %in% c(these_id[[7]], duplicates[[7]])) %>% 
+  filter(thesis_id %in% c(thesis_id[[7]], duplicates[[7]])) %>% 
   DT::datatable(
     rownames = FALSE,
     options = list(
@@ -666,8 +668,6 @@ thesis_metadata %>%
       scrollX = TRUE
     )
   )
-
-
 ```
 
 ::: {.callout-note}

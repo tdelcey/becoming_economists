@@ -47,3 +47,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# html supplementary files
+/FR/documentation/documentation_french_database_files/*
