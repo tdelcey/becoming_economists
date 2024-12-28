@@ -85,7 +85,7 @@ p_load(DT,
 
 The thesis metadata table contains `r ncol(thesis_metadata)` variables: 
 
-- `thesis_id`: the unique identifier of the thesis. If it exists, it is the officiel "national number of the thesis" created by the Agence Bibliographique de l'Enseignement Supérieur (ABES) and the theses.fr website. If not, it is a temporary identifier we have created.
+- `these_id`: the unique identifier of the thesis. If it exists, it is the officiel "national number of the thesis" created by the Agence Bibliographique de l'Enseignement Supérieur (ABES) and the theses.fr website. If not, it is a temporary identifier we have created.
 - `year_defence`: the year of the thesis defence. It covers the period between `r min(thesis_metadata$year_defence, na.rm = TRUE)` and `r max(thesis_metadata$year_defence, na.rm = TRUE)`. 
 - `language_1` and `language_2` are the languages of the thesis. It is a harmonized variable of the information on language found in SUDoc and These.fr. 
 - `title_fr`: the title of the thesis in French.
@@ -96,7 +96,7 @@ The thesis metadata table contains `r ncol(thesis_metadata)` variables:
 - `abstract_other`: the abstract of the thesis in another language.
 - `field`: the field of the thesis. It is a harmonized variable of the respective field variables found in SUDoc and These.fr.
 - `accessible`: a binary variable indicating whether the fulltext is accessible or not. 
-- `type`: the type of the thesis. Type can take `r n_distinct(thesis_metadata$type)` values: `r unique(thesis_metadata$type)`. All categories are categories found in SUDoc (see @tip-type).
+- `type`: the type of the thesis. Type can take `r n_distinct(thesis_metadata$type)` values: `r unique(thesis_metadata$type)`. All categories are categories found in SUDoc. 
 - `country`: the country where the thesis was defended **(à supprimer ?)**.
 - `url`: the url of the thesis, linking to the theses.fr website or the sudoc.fr website.
 - `duplicate_of`: a list of identifiers that are duplicates. 
@@ -218,13 +218,15 @@ p %>%
 
 
 
-::: {.callout-note}
+::: {.callout-note #note-type}
+
 ### The variable `type`
 
 Note that the French education system did not have a harmonized Ph.D. system between the early 1960s and 1984, date of the Sauvy reform that harmonized the Ph.D. system. During this period, various types of theses existed before. It was usual in the mid 1970s to start with a "Doctorat de 3e cycle" before making a "Doctorat d'Etat". Thus, one author can have several types of theses. @fig-metadata_distribution_type shows the distribution of theses over time by the type of thesis. Note also that we cannot ensure that the practice of mentioning the type of thesis in the metadata is systematic: it depends of the quality of the metadata provided by the institutions.
 :::
 
 ::: {.callout-warning}
+
 ### Availability of `abstracts`
 
 The practice of providing abstracts in the metadata started in the 1980s. Before this date, the availability of abstracts is nearly null (see @fig-metadata_accessible). 
@@ -241,7 +243,7 @@ thesis_edge <- readRDS(here(FR_cleaned_data_path, "thesis_edge.rds")) %>% ungrou
 
 Each line in the edge table is a unique edge between a thesis and an entity. We define entity as any individual or institution involved in the thesis. The edge table has `r ncol(thesis_edge)`: 
 
-- `thesis_id`: the identifiers of a thesis (the same than in `thesis_medata`). In the edge table, a `thesis_id` can have several edges. A `thesis_id` has at least two edges: the author and the institution in which the thesis was defended. 
+- `these_id`: the identifiers of a thesis (the same than in `thesis_medata`). In the edge table, a `these_id` can have several edges. A `these_id` has at least two edges: the author and the institution in which the thesis was defended. 
 - `entity_id`: the identifiers of an entity. 
 - `entity_role`: the role of the entity. A person can be either an author, a supervisor, a referee, a president or a member of jury. In addition to the main institution in which the Ph.D. was defended, the `entity_role` can contain additional information we were able to collect such as the other institutions, laboratories, doctoral schools (the institution organizing the doctorate in french university). Note that it concerns only theses collected in these.fr after 1985. For SUDoc, the value `etablissements_soutenance_from_info` may provide additional information on the institution. 
 - `entity_firstname`: The name of the entity. Each entity has a `entity_name`. Note that the entity identifiers is unique but the entity name is not unique. For instance, two different persons can have the same name. When available, an individual can have a `entity_firstname`. 
@@ -528,7 +530,7 @@ digraph project_dag {
  merging_database [label = 'merging_sudoc_thesesfr.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/merging_sudoc_thesesfr.R']
  idref_institutions [label = 'scraping_idref_institution.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_idref_institution.R']
  idref_persons [label = 'scraping_idref_person.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_idref_person.R']
- cleaning_metadata [label = 'cleaning_thesis_metada.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_thesis_metada.R']
+ cleaning_metadata [label = 'cleaning_metadata.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_metadata.R']
  cleaning_institutions [label = 'cleaning_institutions.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_institutions.R']
  cleaning_persons [label = 'cleaning_persons.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_persons.R']
  cleaning_edges [label = 'cleaning_edges.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_edges.R']
@@ -646,7 +648,7 @@ The [3_FR_merging_database.R](/scripts/cleaning_scripts/FR/3_FR_merging_database
 
 ### Metadata {#sec-cleaning-metadata}
 
-The [4_FR_cleaning_thesis_metadata.R](/scripts/cleaning_scripts/FR/4_FR_cleaning_thesis_metadata.R) script is designed to clean metadata information. Sudoc and these.fr sources gathered information inputted by various local institutions and individuals, leading to inconsistencies and errors. The script addresses several key challenges:
+The [4_FR_cleaning_metadata.R](/scripts/cleaning_scripts/FR/4_FR_cleaning_metadata.R) script is designed to clean metadata information. Sudoc and these.fr sources gathered information inputted by various local institutions and individuals, leading to inconsistencies and errors. The script addresses several key challenges:
 
 - **Language detection:** Language consistency is verified across the metadata by leveraging both the [cld3](https://docs.ropensci.org/cld3/reference/cld3.html) [@R-cld3] and [fastText](https://mlampros.github.io/fastText/articles/language_identification.html) [@fastText2016b] models for robust identification. Language consistency is verified across the metadata. Titles and abstracts are checked to ensure that French and English columns contain text matching their intended language. Discrepancies are resolved by reassigning text to the correct fields. For cases where either French or English titles and abstracts are missing, the script employs auxiliary columns originally scraped (`title_other` and `abstract_other`) to fill gaps when relevant. Titles and abstracts written in full uppercase are transformed into sentence case to enhance readability. Placeholder text and irrelevant symbols are also removed, with uninformative entries replaced by missing values (NA). 
 - **Duplicate:** We found many duplicate thesis records in the metadata. It is explained both by the fact that the same thesis can be registered in both Sudoc and Theses.fr and by the fact that the same thesis can be registered several times in the same database by different institutions. We manage duplicates by developping a duplicate detection algorithm. The core of the detection process involves grouping titles by authors and comparing all possible title pairs within each group. The Optimal String Alignment (OSA) distance is used as the primary metric for this comparison. OSA is a robust variant of the Levenshtein distance that estimate the number of actions necessary to match two strings (character insertions, deletions, substitutions, and adjacent character transpositions). The less the distance is, the more the two strings are similar. We also use a normalized OSA distance taking into account the titles lengths. Each potential duplicates is checked by eye and we ensured to capture most true positives and to avoid any false positives. Finally, consistently with the general approach of the project, we did not remove the duplicates but we flagged them in a new column `duplicates`. @tbl-duplicates shows an example of two duplicates.
@@ -660,7 +662,7 @@ The [4_FR_cleaning_thesis_metadata.R](/scripts/cleaning_scripts/FR/4_FR_cleaning
 
 thesis_metadata %>% 
   filter(!is.na(duplicates)) %>% 
-  filter(thesis_id %in% c(thesis_id[[7]], duplicates[[7]])) %>% 
+  filter(thesis_id %in% c(thesis_id[[7]], thesis_id[[7]])) %>% 
   DT::datatable(
     rownames = FALSE,
     options = list(
