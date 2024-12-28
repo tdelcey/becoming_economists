@@ -13,7 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## What is the EconThesis Database project?
 
-The goal is to create a database of the Ph.D. defended in economics in the XXth and XXIst centuries in different countries. This project implies:
+The goal is to create a database of the Ph.D. defended in economics in
+the XXth and XXIst centuries in different countries. This project has a 
+companion website, available [here](https://econthesis.netlify.app/).
+
+This project implies:
 
 - to collect different information through different sources (from list of PhD in `.pdf` files to online institutional databases);
 - to clean these different types of information to obtain the relevant information we need: the author of the PhD dissertation, its title, its date of defence, the university, and any other useful information (PhD supervisor, classification of the PhD dissertation, like a JEL code).
@@ -26,19 +30,18 @@ At this point, the project focuses on three countries:
 
 ## Organisation of the repository
 
-The repository is organised as follows:
+The repository is organised along the different databases for each country. For each country, two folders are available:
 
-- The [documentation](/documentation) folder contains the documentation about the building of the different database. You will find detailed explanations about the process of collecting the data and cleaning it for each country.
-- The [scripts](/scripts) folder contains the different scripts used in the project. They are organised by the type of scripts (scraping data, cleaning data, producing results, etc.) and by the country they are related to. For instance, the [FR](/scripts/cleaning_scripts/FR) folder contains the scripts for cleaning the French data extracted from the [SUDOC](https://www.sudoc.abes.fr/) and [Theses.fr](https://theses.fr/?domaine=theses). 
+- The "documentation" (e.g., for [France](./FR/documentation)) folders contain the documentation
+  about the building of the different database. You will find detailed
+  explanations about the process of collecting the data and cleaning it
+  for each country.
+- The "R" (e.g., for [France](./FR/R)) folders contain the different scripts used to clean and produce the database for the
+  the country in question.
 
-### Details on the scripts folder
+## Databases
 
-- The [paths_and_packages.R](/scripts/paths_and_packages.R) script is used to load the necessary packages and set the paths to the data.
-- The [launch_scripts_in_background.R](/scripts/launch_scripts_in_background.R) script is used to launch different scripts (scraping scripts for now) in the background.
-- The [scraping_scripts](/scripts/scraping_scripts) folder contains the scripts used to scrape the data from the different sources. For now, it is used for French data, to scrape the [SUDOC](https://www.sudoc.abes.fr/) and [idref](https://www.idref.fr/) websites.
-- The [cleaning_scripts](/scripts/cleaning_scripts) folder contains the scripts used to clean the data. 
-- The [producing_results_scripts](/scripts/producing_results_scripts) folder contains the scripts used to produce results to illustrate the content of the database
-- The [analysis_scripts](/scripts/analysis_scripts) folder contains the scripts used to analyse the results produced in the [producing_results_scripts](/scripts/producing_results_scripts) folder.
-- The [helper_scripts](/scripts/helper_scripts) folder contains scripts with different functions used in the other scripts.
+You can find each database in a Zenodo repository:
 
+- [France](https://doi.org/10.5281/zenodo.14541427)
 

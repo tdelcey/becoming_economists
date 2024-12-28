@@ -115,6 +115,7 @@ edge_table_temp <- data.table::dcast(edge_table_temp, nnt + role + order ~ info,
 edge_table_temp <- edge_table_temp[, `:=` (order = NULL,
                                            type = NULL)]
 edges_table_temp <- edge_table_temp[!(is.na(nom) & is.na(idref))] # in case we have elements with no information at all
+edges_table_temp <- unique(edges_table_temp) # Cleaning duplicates in research partner (problem in the original theses.fr database)
 
 # Generate temporary IDs for entities lacking official identifiers (we will try disambuigating them later)
 edge_table_temp[is.na(idref) & str_detect(role, "auteur|membres|directeurs|rapporteurs|president"), 

@@ -52,6 +52,12 @@ institutions_edge <- merge.data.table(institutions_edge,
                                 by = "entity_id", 
                                 all.x = TRUE)
 
+# 4. Remove duplicates institutions when in similar roles
+# We search for duplicates in "institutions_defence", "institution_defence_from_info" and "research_partner". 
+# If we have the same information twice or more for these three entity roles, we keep the first one in "institutions_defence".
+setorder(institutions_edge, thesis_id, entity_role, entity_id)
+institutions_edge <- institutions_edge[! duplicated(institutions_edge[, .(thesis_id, entity_id)]),]
+
 # Cleaning Edges for Persons--------------------------------
 # update person edges (merge by entity_id since we did not remove any id from script cleaning the person table, except duplicates)
 persons_edge <- thesis_edge[! entity_role %in% institution_filter]
@@ -72,6 +78,19 @@ setorder(thesis_edge, thesis_id, entity_role, entity_id)
 saveRDS(thesis_edge[, .(thesis_id, entity_id, original_id, entity_role, entity_name, entity_firstname, original_entity_name, original_entity_firstname, source)], 
         here(FR_cleaned_data_path, "thesis_edge_complete_data.rds"))
 
+# Removing duplicates
+# First we remove what are very certain duplicates with similar entity name and id
+thesis_edge_filtered <- thesis_edge[, .(thesis_id, entity_id, entity_role, entity_name, entity_firstname)] %>% 
+  unique()
+
+# Then, we need to do some manual cleaning to separate true duplicates from false ones
+thesis_edge_filtered[thesis_id == "1985REN1G001" & entity_role == "author", entity_firstname := first(entity_firstname)]
+thesis_edge_filtered[thesis_id == "1987AIX32018" & entity_role == "supervisor", entity_firstname := first(entity_firstname)]
+thesis_edge_filtered[thesis_id == "temp_sudoc_thesis_720030" & entity_role == "supervisor", entity_firstname := first(entity_firstname)]
+
+# Now we can remove duplicates with same name and first names
+thesis_edge_filtered <- thesis_edge_filtered[!duplicated(thesis_edge_filtered[, .(thesis_id, entity_role, entity_name, entity_firstname)])]
+
 # This is the short usable version, with no duplicates
-saveRDS(thesis_edge[, .(thesis_id, entity_id, entity_role, entity_name, entity_firstname)] %>% unique(),
+saveRDS(thesis_edge_filtered,
         here(FR_cleaned_data_path, "thesis_edge.rds"))
