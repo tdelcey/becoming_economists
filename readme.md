@@ -5,7 +5,8 @@ Thomas Delcey, Aurélien Goutsmedt
 
 The goal is to create a database of the Ph.D. defended in economics in
 the XXth and XXIst centuries in different countries. This project has a
-companion website, available [here](https://econthesis.netlify.app/).
+companion website, available
+[here](https://tdelcey.github.io/becoming_economists_page/).
 
 This project implies:
 
@@ -19,7 +20,7 @@ This project implies:
 
 At this point, the project focuses on three countries:
 
-- France, collecting data from the [SUDOC](https://www.sudoc.abes.fr/)
+- France, collecting data from the [Sudoc](https://www.sudoc.abes.fr/)
   and [Theses.fr](https://theses.fr/?domaine=theses) databases;
 - The United States, collecting data from the list of PhD granted in US
   universities, published each year by the *American Economic Review*
@@ -45,3 +46,4 @@ country. For each country, two folders are available:
 You can find each database in a Zenodo repository:
 
 - [France](https://doi.org/10.5281/zenodo.14541427)
+- United States: work in progress

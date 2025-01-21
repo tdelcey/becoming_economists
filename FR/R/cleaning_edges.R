@@ -65,9 +65,9 @@ setnames(persons_edge, c("entity_name", "entity_firstname"), c("original_entity_
 
 # Add preferred names for persons from `thesis_person` table
 persons_edge <- merge.data.table(persons_edge, 
-                                thesis_person[, .(entity_id, entity_name, entity_firstname)], 
-                                by = "entity_id", 
-                                all.x = TRUE)
+                                 thesis_person[, .(entity_id, entity_name, entity_firstname)], 
+                                 by = "entity_id", 
+                                 all.x = TRUE)
 
 # Saving the final edge tables--------------------------------
 # Combine cleaned edges for institutions and persons
@@ -78,15 +78,16 @@ setorder(thesis_edge, thesis_id, entity_role, entity_id)
 saveRDS(thesis_edge[, .(thesis_id, entity_id, original_id, entity_role, entity_name, entity_firstname, original_entity_name, original_entity_firstname, source)], 
         here(FR_cleaned_data_path, "thesis_edge_complete_data.rds"))
 
+
 # Removing duplicates
 # First we remove what are very certain duplicates with similar entity name and id
 thesis_edge_filtered <- thesis_edge[, .(thesis_id, entity_id, entity_role, entity_name, entity_firstname)] %>% 
-  unique()
+  unique() 
 
 # Then, we need to do some manual cleaning to separate true duplicates from false ones
 thesis_edge_filtered[thesis_id == "1985REN1G001" & entity_role == "author", entity_firstname := first(entity_firstname)]
 thesis_edge_filtered[thesis_id == "1987AIX32018" & entity_role == "supervisor", entity_firstname := first(entity_firstname)]
-thesis_edge_filtered[thesis_id == "temp_sudoc_thesis_720030" & entity_role == "supervisor", entity_firstname := first(entity_firstname)]
+thesis_edge_filtered[entity_name == "Centi" & entity_role == "supervisor", entity_firstname := first(entity_firstname)]
 
 # Now we can remove duplicates with same name and first names
 thesis_edge_filtered <- thesis_edge_filtered[!duplicated(thesis_edge_filtered[, .(thesis_id, entity_role, entity_name, entity_firstname)])]

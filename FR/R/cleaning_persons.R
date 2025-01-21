@@ -67,7 +67,7 @@ thesis_person[, homonym_of := vector("list", .N)]  # Initialize as a list column
 thesis_person[, homonym_of := fifelse(.N > 1, list(list(entity_id)), list(NA)), by = new_id] # the first list wrap the entity_id in a list, the second list wrap all the entity_id together
 
 # Step 3: # Remove the current `entity_id` from the list of homonyms
-thesis_person[! is.na(homonym_of), homonym_of := map2(homonym_of, entity_id, ~ unlist(.x) %>% setdiff(.y))] 
+# thesis_person[! is.na(homonym_of), homonym_of := map2(homonym_of, entity_id, ~ unlist(.x) %>% setdiff(.y))] 
 thesis_person[, `:=` (authors = NULL, new_id = NULL)]
 
 # Attribute Missing Gender-----------------------
@@ -114,7 +114,7 @@ thesis_person[, entity_name := str_to_title(entity_name)]
 thesis_person[, entity_firstname := str_to_title(entity_firstname)]
 
 # Save the Cleaned Data -------------------------------------------------------
-thesis_person <- thesis_person[, .(entity_firstname, entity_id, entity_name, gender, gender_expanded,
-                                   birth, country_name, info, organization, last_date_org, start_date_org, 
+thesis_person <- thesis_person[, .(entity_id, entity_name, entity_firstname, gender, gender_expanded,
+                                   birth, country_name, information = info, organization, last_date_org, start_date_org, 
                                    end_date_org, other_link, homonym_of)]
 saveRDS(thesis_person, here(FR_cleaned_data_path, "thesis_person.rds"))

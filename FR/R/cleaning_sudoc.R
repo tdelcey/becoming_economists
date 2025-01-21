@@ -233,7 +233,8 @@ data <- data %>%
 
 data <- data %>%
   rename(thesis_id = nnt) %>% 
-  mutate(accessible = NA, # for conformity with theses.fr
+  mutate(accessible = NA_character_, # for conformity with theses.fr
+         url = str_remove(url, "\\.xml$"), # for a more standard format url, going directly to the sudoc webpage
          country = "France",
          thesis_id = ifelse(is.na(thesis_id), paste0("temp_sudoc_thesis_", sample(100000:999999, nrow(.))), thesis_id))
 
