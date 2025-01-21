@@ -46,4 +46,6 @@ country. For each country, two folders are available:
 You can find each database in a Zenodo repository:
 
 - [France](https://doi.org/10.5281/zenodo.14541427)
+  [![](https://zenodo.org/badge/DOI/10.5281/zenodo.14541427.svg)](https://doi.org/10.5281/zenodo.14541427)
+
 - United States: work in progress

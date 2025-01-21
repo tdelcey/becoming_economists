@@ -11,6 +11,7 @@ format:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
 ## What is the EconThesis Database project?
 
 The goal is to create a database of the Ph.D. defended in economics in
@@ -43,5 +44,6 @@ The repository is organised along the different databases for each country. For 
 
 You can find each database in a Zenodo repository:
 
-- [France](https://doi.org/10.5281/zenodo.14541427)
+- [France](https://doi.org/10.5281/zenodo.14541427) [![](https://zenodo.org/badge/DOI/10.5281/zenodo.14541427.svg)](https://doi.org/10.5281/zenodo.14541427)
+
 - United States: work in progress

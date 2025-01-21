@@ -36,6 +36,8 @@ bibliography: bibliography.bib
 source(here::here("paths_and_packages.R"))
 ```
 
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.14541427.svg)](https://doi.org/10.5281/zenodo.14541427)
+
 # Introduction
 
 This database compiles information on Ph.D. dissertations in economics defended in France since 1900.^[While the focus is on France, both the database and its accompanying documentation are presented in English. This decision reflects its integration into a larger initiative, which seeks to establish a comprehensive global repository of Ph.D. dissertations in economics.]
