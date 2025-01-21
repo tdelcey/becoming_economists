@@ -340,6 +340,9 @@ thesis_metadata[title_fr %like% "Approche systémique et régulation économique
 # sort 
 thesis_metadata[title_fr %like% "Approche systémique et régulation économique", duplicates := map(duplicates, ~ sort(.x))]
 
+# remove false positive duplicates
+thesis_metadata[thesis_id %in% c("1996PA131022", "1999EHESA025"), duplicates := NA_character_]
+
 ## Checking the right number of duplicates----------------------------------------
 # We unnest the duplicates and we check that each id is present the same number of 
 # times on both sides.
