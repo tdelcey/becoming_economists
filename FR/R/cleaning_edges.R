@@ -2,9 +2,9 @@
 
 #' Purpose: 
 #' This script cleans and standardizes edges (relationships) between theses, 
-#' institutions, and persons. It utilizes data from `idref` for standardizing 
-#' institution and person names and ensures removal of duplicates. It uses the
-#' data cleaned in `cleaning_institutions.R` and `cleaning_persons.R`.
+#' institutions, and individuals. It utilizes data from `idref` for standardizing 
+#' institution and individual names and ensures removal of duplicates. It uses the
+#' data cleaned in `cleaning_institutions.R` and `cleaning_individuals.R`.
 #' 
 #' Outputs:
 #' 1. A complete data frame of edges with originally scraped information for validation.
@@ -14,7 +14,7 @@
 source(file.path("paths_and_packages.R"))
 p_load(tidyfast)
 
-thesis_person <- readRDS(here(FR_cleaned_data_path, "thesis_person.rds"))
+thesis_individual <- readRDS(here(FR_cleaned_data_path, "thesis_individual.rds"))
 thesis_institution <- readRDS(here(FR_cleaned_data_path, "thesis_institution.rds"))
 thesis_edge <- readRDS(here(FR_intermediate_data_path, "thesis_edge.rds"))
 
@@ -58,20 +58,20 @@ institutions_edge <- merge.data.table(institutions_edge,
 setorder(institutions_edge, thesis_id, entity_role, entity_id)
 institutions_edge <- institutions_edge[! duplicated(institutions_edge[, .(thesis_id, entity_id)]),]
 
-# Cleaning Edges for Persons--------------------------------
-# update person edges (merge by entity_id since we did not remove any id from script cleaning the person table, except duplicates)
-persons_edge <- thesis_edge[! entity_role %in% institution_filter]
-setnames(persons_edge, c("entity_name", "entity_firstname"), c("original_entity_name", "original_entity_firstname"))
+# Cleaning Edges for individuals--------------------------------
+# update individual edges (merge by entity_id since we did not remove any id from script cleaning the individual table, except duplicates)
+individuals_edge <- thesis_edge[! entity_role %in% institution_filter]
+setnames(individuals_edge, c("entity_name", "entity_firstname"), c("original_entity_name", "original_entity_firstname"))
 
-# Add preferred names for persons from `thesis_person` table
-persons_edge <- merge.data.table(persons_edge, 
-                                 thesis_person[, .(entity_id, entity_name, entity_firstname)], 
+# Add preferred names for individuals from `thesis_individual` table
+individuals_edge <- merge.data.table(individuals_edge, 
+                                 thesis_individual[, .(entity_id, entity_name, entity_firstname)], 
                                  by = "entity_id", 
                                  all.x = TRUE)
 
 # Saving the final edge tables--------------------------------
-# Combine cleaned edges for institutions and persons
-thesis_edge <- bind_rows(institutions_edge, persons_edge) 
+# Combine cleaned edges for institutions and individuals
+thesis_edge <- bind_rows(institutions_edge, individuals_edge) 
 setorder(thesis_edge, thesis_id, entity_role, entity_id)
 
 # Save the complete edge table with all original information for validation

@@ -1,4 +1,4 @@
-##################### Cleaning Persons Data ######################
+##################### Cleaning Institutions Data ######################
 
 #' Purpose: The goal is to replace the maximum of temporary id by real id from idref 
 #' and to clean the institution names.

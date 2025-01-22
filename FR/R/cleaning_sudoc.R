@@ -228,7 +228,7 @@ data <- data %>%
 #' We will save the data in four different files:
 #' - sudoc_metadata: the metadata of the theses
 #' - sudoc_edge: the edge file which linked theses with institutions and individuals
-#' - sudoc_person: the table with information about individuals participating to the theses (authors, jury members, etc.)
+#' - sudoc_individual: the table with information about individuals participating to the theses (authors, jury members, etc.)
 #' - sudoc_institution: the table with information about institutions linked to the theses (laboratories, universities, etc.)
 
 data <- data %>%
@@ -262,7 +262,7 @@ saveRDS(sudoc_metadata, here(FR_sudoc_intermediate_data_path, "sudoc_metadata.rd
 ## Creating Edge Table--------
 
 #' One important step here is to create an id for each entity (individual or institution) that is not identified by an idref.
-#' We will differentiate them by a prefix "temp_sudoc_person_" or "temp_sudoc_institution_" followed by a random number. 
+#' We will differentiate them by a prefix "temp_sudoc_individual_" or "temp_sudoc_institution_" followed by a random number. 
 sudoc_edge <- data %>% 
   select(thesis_id,
          author_idref,
@@ -302,7 +302,7 @@ sudoc_edge <- data %>%
          entity_firstname = firstname) %>% 
   select(-order) %>% 
   mutate(entity_id = ifelse(is.na(entity_id) & str_detect(entity_role, "author|member|supervisor|reviewer|president"), 
-                        paste0("temp_sudoc_person_", 
+                        paste0("temp_sudoc_individual_", 
                                sample(100000:999999, nrow(.))), entity_id),
          entity_id = ifelse(is.na(entity_id) & str_detect(entity_role, "institution|school|partner|laboratory"), 
                             paste0("temp_sudoc_institution_", 
@@ -314,14 +314,14 @@ sudoc_edge <- sudoc_edge %>%
 
 saveRDS(sudoc_edge, here(FR_sudoc_intermediate_data_path, "sudoc_edge.rds"))
 
-## Person table ------
+## individual table ------
 
-sudoc_person <- sudoc_edge %>%
+sudoc_individual <- sudoc_edge %>%
   filter(str_detect(entity_role, "author|member|supervisor|reviewer|president")) %>%
   select(entity_id, entity_name, entity_firstname) %>%
   unique()
 
-saveRDS(sudoc_person, here(FR_sudoc_intermediate_data_path, "sudoc_person.rds"))
+saveRDS(sudoc_individual, here(FR_sudoc_intermediate_data_path, "sudoc_individual.rds"))
 
 ## Institution table ------
 

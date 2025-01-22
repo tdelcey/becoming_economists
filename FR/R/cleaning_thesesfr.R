@@ -68,7 +68,7 @@ raw_theses[, `:=` (langues.1 = ifelse(str_count(langues.0) > 2, str_sub(langues.
 #' Split the cleaned dataset into four structured tables:
 #' - `thesesfr_metadata`: Core metadata about each thesis.
 #' - `thesesfr_edge`: Links between theses and associated entities (individuals and institutions).
-#' - `thesesfr_person`: Information about individuals involved in the theses.
+#' - `thesesfr_individual`: Information about individuals involved in the theses.
 #' - `thesesfr_institution`: Information about institutions linked to the theses.
 
 ## Thesis metadata table--------
@@ -119,7 +119,7 @@ edges_table_temp <- unique(edges_table_temp) # Cleaning duplicates in research p
 
 # Generate temporary IDs for entities lacking official identifiers (we will try disambuigating them later)
 edge_table_temp[is.na(idref) & str_detect(role, "auteur|membres|directeurs|rapporteurs|president"), 
-                idref := paste0("temp_thesefr_person_", 100000:(100000+.N-1))]
+                idref := paste0("temp_thesefr_individual_", 100000:(100000+.N-1))]
 edge_table_temp[is.na(idref) & str_detect(role, "etablissements|ecoles|partenaires"), 
                 idref := paste0("temp_thesefr_institution_", 100000:(100000+.N-1))]
 
@@ -143,11 +143,11 @@ edge_table_temp[, source := "thesesfr"]
 
 saveRDS(edge_table_temp, here(FR_thesefr_intermediate_data_path, "thesesfr_edge.rds"))
 
-## Creating Person Table-----------
-thesesfr_person <- edge_table_temp[str_detect(entity_role, "author|member|supervisor|reviewer|president")]
-thesesfr_person <- thesesfr_person[, `:=` (thesis_id = NULL, entity_role = NULL)] %>%
+## Creating individual Table-----------
+thesesfr_individual <- edge_table_temp[str_detect(entity_role, "author|member|supervisor|reviewer|president")]
+thesesfr_individual <- thesesfr_individual[, `:=` (thesis_id = NULL, entity_role = NULL)] %>%
   unique()
-saveRDS(thesesfr_person, here(FR_thesefr_intermediate_data_path, "thesesfr_person.rds"))
+saveRDS(thesesfr_individual, here(FR_thesefr_intermediate_data_path, "thesesfr_individual.rds"))
 
 ## Creating Institution Table-----------
 thesesfr_institution <- edge_table_temp[str_detect(entity_role, "institution|school|partner|laboratory")]
