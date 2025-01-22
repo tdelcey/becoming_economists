@@ -118,19 +118,23 @@ The `thesis_metadata` table contains `r ncol(thesis_metadata)` variables:
 
 - `thesis_id`: the unique identifier of the thesis. If it exists, it is the official "national number of the thesis" created by the ABES and the theses.fr website. If not, it is a temporary identifier we have created.
 - `year_defence`: the year of the thesis defense. Our database covers the period `r min(thesis_metadata$year_defence, na.rm = TRUE)`-`r max(thesis_metadata$year_defence, na.rm = TRUE)`. 
-- `language` and `language_2` are the languages of the thesis. The variable is harmonized to make the information on language found in Sudoc and These.fr compatible.
+- `author`: the first name and last name of the author of the thesis.
+- `author_id`: the identifier of the author. If it exists, it is the official "idref" created by the ABES. If not, it is a temporary identifier we have created.
 - `title_fr`: the title of the thesis in French.
 - `title_en`: the title of the thesis in English.
 - `title_other`: the title of the thesis in another language.
 - `abstract_fr`: the abstract of the thesis in French. 
 - `abstract_en`: the abstract of the thesis in English.
 - `abstract_other`: the abstract of the thesis in another language.
-- `field`: the field of the thesis (such as "Sciences économiques"). The field remains unaltered by our work and can take on a wide range of values, as indicated by the number of distinct entries  (`r n_distinct(thesis_metadata$field)`).
-- `accessible`: a binary variable indicating whether the fulltext is accessible or not (data coming only from theses.fr). 
-- `type`: the type of the thesis. Type can take `r n_distinct(thesis_metadata$type)` values: `r unique(thesis_metadata$type)`. All categories are derived from categories found in Sudoc.
+- `language` and `language_2` are the languages of the thesis. The variable is harmonized to make the information on language found in Sudoc and These.fr compatible.
+- `institution_thesis_name`: the name of the institution where the thesis was defended. The name is standardized using IdRef preferred name.
+- `institution_thesis_id`: the identifier of the institution where the thesis was defended. If it exists, it is the official "idref" created by the ABES. If not, it is a temporary identifier we have created.
 - `country`: the country where the thesis was defended, i.e. France.  <!-- Cela va servir quand on va merger avec les autres bases de données, donc faut le garder pour la cohérence -->
+- `field`: the field of the thesis (such as "Sciences économiques"). The field remains unaltered by our work and can take on a wide range of values, as indicated by the number of distinct entries  (`r n_distinct(thesis_metadata$field)`).
+- `type`: the type of the thesis. Type can take `r n_distinct(thesis_metadata$type)` values: `r unique(thesis_metadata$type)`. All categories are derived from categories found in Sudoc.
+- `accessible`: a binary variable indicating whether the fulltext is accessible or not (data coming only from theses.fr). 
 - `url`: the url of the thesis on [theses.fr](https://theses.fr/) or [Sudoc](https://www.sudoc.fr/) websites
-- `duplicate_of`: a list of `thesis_id` that indicate duplicated thesis. We identified duplicates but did not remove them to preserve the maximum information from the raw sources. This variable allows users to handle duplicates using their preferred strategy.
+- `duplicates`: a list of `thesis_id` that indicate duplicated thesis. We identified duplicates but did not remove them to preserve the maximum information from the raw sources. This variable allows users to handle duplicates using their preferred strategy.
 
 
 ::: {.callout-note #note-identifiers}
@@ -275,8 +279,8 @@ Each line in the `thesis_edge` table represents a unique edge between a thesis a
 
 - `thesis_id`: the identifier of a thesis (the same as in thesis_metadata). In the edge table, a `thesis_id` can have several edges. A `thesis_id` has _at least_ two edges: the author and the institution where the thesis was defended.   
 - `entity_id`: the identifier of an entity. If it exists, it is the official "idref", an unique identifiers created by the ABES (see [https://www.idref.fr/](https://www.idref.fr/)). If not, it is a temporary identifier we have created following the strategy we used for `thesis_id`.
-- `entity_role`: the role of the entity. A person, for example, may serve as an author, supervisor, referee, president, or jury member. In addition to identifying the primary institution where the Ph.D. was defended, the `entity_role` variable may include supplementary information we collected, such as affiliations with other institutions, laboratories, or doctoral schools (the organizations responsible for overseeing doctoral programs in French universities). This detailed information primarily applies to theses recorded in theses.fr after 1985. For data sourced from Sudoc, the value "etablissements_soutenance_from_info" of `entity_role` may provide additional information regarding the institutions associated with the thesis.
-- `entity_name`: The name of the entity. It is derived from the preferred name in the official IdRef notice, or from raw information when the entity has no IdRef. See @sec-cleaning-institutions and  @sec-cleaning-persons for more information about names standardization.  
+- `entity_role`: the role of the entity. An individual, for example, may serve as an author, supervisor, referee, president, or jury member. In addition to identifying the primary institution where the Ph.D. was defended, the `entity_role` variable may include supplementary information we collected, such as affiliations with other institutions, laboratories, or doctoral schools (the organizations responsible for overseeing doctoral programs in French universities). This detailed information primarily applies to theses recorded in theses.fr after 1985. For data sourced from Sudoc, the value "etablissements_soutenance_from_info" of `entity_role` may provide additional information regarding the institutions associated with the thesis.
+- `entity_name`: The name of the entity. It is derived from the preferred name in the official IdRef notice, or from raw information when the entity has no IdRef. See @sec-cleaning-institutions and  @sec-cleaning-individuals for more information about names standardization.  
 - `entity_firstname`, the first name of the individual. Coded as missing value when the entity is an institution. 
 
 ::: {#notes-edges .callout-note}
@@ -286,7 +290,7 @@ Each line in the `thesis_edge` table represents a unique edge between a thesis a
 Through the [https://www.idref.fr/](https://www.idref.fr/) platform, the ABES assigns unique identifiers to institutions and individuals involved in research in France. This system provides valuable information about entities, such as their dates of existence and the various names used to refer to entities. For example, see the entry for the former [University of Paris](https://www.idref.fr/034526110) that split after 1968. We scrapped those information to enrich our institution and individual tables (see @sec-idref).
 :::
 
-@tbl-edges shows a sample of the thesis edge table. We identify `r nrow(thesis_edge)` edges in total. @fig-person-role shows the distribution of individuals by role. @fig-person-institution shows the distribution of individuals for the top institutions.
+@tbl-edges shows a sample of the thesis edge table. We identify `r nrow(thesis_edge)` edges in total. @fig-individual-role shows the distribution of individuals by role. @fig-individual-institution shows the distribution of individuals for the top institutions.
 
 
 ```{r}
@@ -317,7 +321,7 @@ thesis_edge %>%
 
 ```{r}
 #| echo: FALSE
-#| label: fig-person-role 
+#| label: fig-individual-role 
 #| fig.cap: "Top role"
 
 p <- thesis_edge %>% 
@@ -342,7 +346,7 @@ p %>%
 
 ```{r}
 #| echo: FALSE
-#| label: fig-person-institution
+#| label: fig-individual-institution
 #| fig.cap: "Top role"
 
 p <- thesis_edge %>% 
@@ -469,17 +473,17 @@ thesis_institution %>%
 
 ```{r}
 #| echo: FALSE
-thesis_person <- readRDS(here(FR_cleaned_data_path, "thesis_person.rds"))
+thesis_individual <- readRDS(here(FR_cleaned_data_path, "thesis_individual.rds"))
 ```
 
 
-In the individuals table, each line represents a unique individual. Individual are the authors, supervisors and other jury members associated with the theses. The table contains `r nrow(thesis_person)` individuals and `r ncol(thesis_person)` variables: 
+In the individuals table, each line represents a unique individual. Individual are the authors, supervisors and other jury members associated with the theses. The table contains `r nrow(thesis_individual)` individuals and `r ncol(thesis_individual)` variables: 
 
 - `entity_id`: the unique identifier of the individual.
 - `entity_name`: the family name of the individual.
 - `entity_firstname`: the first name of the individual.
 - `gender`: the gender of the individual according to the IdRef database.
-- `gender_expanded`: the gender of the individual according to the IdRef database augmented for missing values with the French census data (see details in @sec-cleaning-persons).
+- `gender_expanded`: the gender of the individual according to the IdRef database augmented for missing values with the French census data (see details in @sec-cleaning-individuals).
 
 The other variables are additional information on the individual provided by the IdRef database:
 
@@ -491,23 +495,23 @@ The other variables are additional information on the individual provided by the
 - `start_date_org`: the starting dates for each organization in which the individual worked.
 - `end_date_org`: the ending dates for each organization in which the individual worked.
 - `other_link`: a list of link to relevant online repository pages of the individual.
-- `homonym_of`: a list of the `entity_id` of the individual's homonyms (see @sec-cleaning-persons for details). 
+- `homonym_of`: a list of the `entity_id` of the individual's homonyms (see @sec-cleaning-individuals for details). 
 
 ::: {#warning-homonyms .callout-warning}
 
 ### Handling missing identifiers for individuals with `homonym_of` 
 
-Disambiguating individual entities, when IdRef identifiers were missing, proved more challenging than disambiguating institutions. For example, it is relatively straightforward to determine that the strings "Université Paris I" and "Université Paris I Panthéon-Sorbonne" refer to the same institution. In contrast, identifying whether "Robert Martin," who authored a Ph.D. in 1985, is the same individual as "Robert Martin," who supervised a Ph.D. in 2022, is far less certain. To assist users in identifying potential matches between individuals, the variable `homonym_of` highlights cases where two records may represent the same person. For further details on the methodology, refer to @sec-cleaning-persons. 
+Disambiguating individual entities, when IdRef identifiers were missing, proved more challenging than disambiguating institutions. For example, it is relatively straightforward to determine that the strings "Université Paris I" and "Université Paris I Panthéon-Sorbonne" refer to the same institution. In contrast, identifying whether "Robert Martin," who authored a Ph.D. in 1985, is the same individual as "Robert Martin," who supervised a Ph.D. in 2022, is far less certain. To assist users in identifying potential matches between individuals, the variable `homonym_of` highlights cases where two records may represent the same individual. For further details on the methodology, refer to @sec-cleaning-individuals. 
 ::: 
 
-@tbl-person shows a sample of the thesis metadata table.
+@tbl-individual shows a sample of the thesis metadata table.
 
 ```{r}
 #| echo: FALSE
-#| label: tbl-person
-#| tbl-cap: "Sample of the thesis person table"
+#| label: tbl-individual
+#| tbl-cap: "Sample of the thesis individual table"
 
-thesis_person %>% 
+thesis_individual %>% 
   mutate(information = str_trunc(information, 70)) %>% 
   slice_sample(n = 5) %>% 
   DT::datatable(
@@ -527,11 +531,11 @@ thesis_person %>%
 
 ```{r}
 #| echo: FALSE
-#| label: fig-person_genre
+#| label: fig-individual_genre
 #| fig.cap: "Distribution of individuals by gender"
 
 
-p <- thesis_person %>%
+p <- thesis_individual %>%
   mutate(gender_expanded = ifelse(is.na(gender_expanded), "Unknown", gender_expanded)) %>% 
   mutate(total = n()) %>% 
   add_count(gender_expanded) %>% 
@@ -556,11 +560,11 @@ p %>%
 
 ```{r}
 #| echo: FALSE
-#| label: fig-person_country
+#| label: fig-individual_country
 #| fig.cap: "Distribution of individuals by country (top 10 excluding France)"
 
 
-thesis_person %>%
+thesis_individual %>%
   mutate(country_name = ifelse(is.na(country_name), "Unknown", country_name)) %>%
   count(country_name) %>% 
   filter(country_name != "Unknown" & country_name != "France") %>% 
@@ -608,8 +612,9 @@ digraph project_dag {
  idref_persons [label = 'scraping_idref_person.R', shape = box, style = filled, fillcolor = lightblue, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_idref_person.R']
  cleaning_metadata [label = 'cleaning_metadata.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_metadata.R']
  cleaning_institutions [label = 'cleaning_institutions.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_institutions.R']
- cleaning_persons [label = 'cleaning_persons.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_persons.R']
+ cleaning_individuals [label = 'cleaning_individuals.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_individuals.R']
  cleaning_edges [label = 'cleaning_edges.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_edges.R']
+ adding_columns [label = 'adding_columns_metadata.R', shape = box, style = filled, fillcolor = lightyellow, URL = 'https://github.com/tdelcey/becoming_economists/blob/main/FR/R/adding_columns_metadata.R']
  
  # Define edges
  scraping_sudoc_id -> scraping_sudoc_api
@@ -621,10 +626,11 @@ digraph project_dag {
  merging_database -> idref_persons
  merging_database -> cleaning_metadata
  idref_institutions -> cleaning_institutions
- idref_persons -> cleaning_persons
+ idref_persons -> cleaning_individuals
  cleaning_metadata -> cleaning_edges
  cleaning_institutions -> cleaning_edges
- cleaning_persons -> cleaning_edges
+ cleaning_individuals -> cleaning_edges
+ cleaning_edges -> adding_columns
 }
 ")
 
@@ -694,7 +700,7 @@ The value "Thèse" of the `Type` variable is default value when we cannot identi
 
 Note that the value of `Language` are also standardized to align with ISO conventions, ensuring compatibility with theses.fr data. 
 
-The final dataset is divided into four tables that constitute the relational database: metadata, edge, person, and institution. For entities without official identifiers, temporary IDs are generated to enable future identification and disambiguation. Temporary identifiers are under the format `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr") and Y being a randomly generated unique number.
+The final dataset is divided into four tables that constitute the relational database: metadata, edge, individual, and institution. For entities without official identifiers, temporary IDs are generated to enable future identification and disambiguation. Temporary identifiers are under the format `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr") and Y being a randomly generated unique number.
 
 ### Theses.fr 
 
@@ -706,7 +712,7 @@ As with the Sudoc data, temporary IDs are generated for entities lacking officia
 
 ### Merging 
 
-The [merging_database.R](https://github.com/tdelcey/becoming_economists/blob/main/FR/R/merging_database.R) script processes four types of tables---theses, edges, persons, and institutions---generated from both the Sudoc and Theses.fr datasets. The script merges these tables in pairs to produce four intermediate merged tables. These intermediate data frames are subsequently cleaned and standardized in the following scripts.
+The [merging_database.R](https://github.com/tdelcey/becoming_economists/blob/main/FR/R/merging_database.R) script processes four types of tables---theses, edges, individuals, and institutions---generated from both the Sudoc and Theses.fr datasets. The script merges these tables in pairs to produce four intermediate merged tables. These intermediate data frames are subsequently cleaned and standardized in the following scripts.
 
 ### Metadata {#sec-cleaning-metadata}
 
@@ -753,28 +759,28 @@ The script employs a manually curated table that associates regular expressions 
   - The thesis defense occurred before 1968, the identifier is replaced with [the identifier of the historic University of Paris](https://www.idref.fr/034526110), as it was the only university in Paris at the time. 
   - If the thesis is defended after 1968, the string "Université de Paris" is ambigous since it describes several distinct institutions. In this case, we kept the temporary identifier because we are not able to resolve the ambiguity. 
 
-### Individuals {#sec-cleaning-persons}
+### Individuals {#sec-cleaning-individuals}
 
-The script [cleaning_persons.R](https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_persons.R) is designed to standardize and enhance the quality of person data.
+The script [cleaning_individuals.R](https://github.com/tdelcey/becoming_economists/blob/main/FR/R/cleaning_individuals.R) is designed to standardize and enhance the quality of individual data.
 
-The script first enriches individual records by incorporating information from the `idref_person_table`, built from [scraping_idref_person.R](https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_idref_person.R). When a name entity is linked to an IdRef identifier, supplementary details about the individual---such as organization affiliations, birth date, and relevant links (e.g., Wikipedia pages)---are added from the IdRef database. Additionally, raw names extracted from Sudoc or theses.fr are replaced with the standardized names provided by IdRef.
+The script first enriches individual records by incorporating information from the `idref_individual_table`, built from [scraping_idref_person.R](https://github.com/tdelcey/becoming_economists/blob/main/FR/R/scraping_idref_person.R). When a name entity is linked to an IdRef identifier, supplementary details about the individual---such as organization affiliations, birth date, and relevant links (e.g., Wikipedia pages)---are added from the IdRef database. Additionally, raw names extracted from Sudoc or theses.fr are replaced with the standardized names provided by IdRef.
 
-A key focus of the script is addressing inconsistencies in person identifiers. Challenges include:
+A key focus of the script is addressing inconsistencies in individual identifiers. Challenges include:
 
   - Variations in names: The same individual may appear with slight name differences (e.g., "Jean A. Dupont" vs. "Jean Dupont").
   - Duplicate identifiers: A single individual may be associated with different identifiers across or within datasets (e.g., as an author in Sudoc in 1983 and as a jury member in theses.fr in 1999).
 
-While the script strives to identify and group such cases, disambiguating person identifiers is constrained by the risk of homonyms. For example, two individuals with identical names may represent distinct persons. Due to this ambiguity, it is not possible to merge identifiers confidently.
+While the script strives to identify and group such cases, disambiguating individual identifiers is constrained by the risk of homonyms. For example, two individuals with identical names may represent distinct individuals. Due to this ambiguity, it is not possible to merge identifiers confidently.
 
-To address potential ambiguities, the script introduces a new column, `homonym_of`, which groups potential homonyms. For each person, the `homonym_of` field lists the identifiers of individuals with identical or highly similar names. This approach prevents premature merges while flagging possible relationships for users to investigate further.
+To address potential ambiguities, the script introduces a new column, `homonym_of`, which groups potential homonyms. For each individual, the `homonym_of` field lists the identifiers of individuals with identical or highly similar names. This approach prevents premature merges while flagging possible relationships for users to investigate further.
 
 ```{r}
 #| echo: FALSE
-#| label: tbl-duplicates_person
-#| tbl-cap: "Example of persons identified as homonym"
+#| label: tbl-duplicates_individual
+#| tbl-cap: "Example of individuals identified as homonym"
 
 
-thesis_person %>%
+thesis_individual %>%
   filter(!is.na(homonym_of)) %>%
   filter(map_lgl(homonym_of, ~ "057545863" %in% .)) %>%
   DT::datatable(rownames = FALSE,

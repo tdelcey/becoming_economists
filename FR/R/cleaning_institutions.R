@@ -151,7 +151,7 @@ institutions_to_clean <- tribble(
   "^BSE", "261722948", #labo
   "^Triangle", "113318634", # labo
   "Centre de recherche en économie de Grenoble", "168272903", #labo
-  "Lille économie management", "161571565", # labo
+  "Lille économie management", "161571565" # labo
 ) 
 
 # Now we have the manually checked idref, we can add dates of birth and death to validate the merging of id
@@ -217,3 +217,4 @@ thesis_institutions <- merge(thesis_institutions, idref_institutions[, -(c("scra
 
 # Save the cleaned dataset -----------------------------------------------------
 saveRDS(thesis_institutions, here(FR_cleaned_data_path, "thesis_institution.rds"))
+
