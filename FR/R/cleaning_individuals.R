@@ -13,6 +13,7 @@ source(file.path("paths_and_packages.R"))
 # Load data on individuals
 idref_individual_table <- readRDS(here(FR_raw_data_path, "idref", "idref_persons.rds")) %>% 
   as.data.table
+
 setkey(idref_individual_table, idref)
 thesis_individual <- readRDS(here(FR_intermediate_data_path, "thesis_individual.rds"))
 setkey(thesis_individual, entity_id)
@@ -21,12 +22,20 @@ setkey(thesis_individual, entity_id)
 
 # Process idref_individual_table
 idref_individual_table[, birth := str_extract(birth, ".{4}")] # Extract only the year from birth
-idref_individual_table[, length_info := map_int(info, length)]
-idref_individual_table[, info := ifelse(length_info > 1,
-                                    map_chr(info, ~ paste0(., collapse = "\n")),
-                                    unlist(info))] # paste into one value info if multiple values
-idref_individual_table[, `:=` (length_info = NULL,
-                           date_scrap = NULL)]  # Remove intermediate columns no longer needed
+
+# Managing the different elements in the information column
+idref_individual_table[, info := map_chr(info, function(x) {
+  if (length(x) == 0) {
+    NA_character_
+  } else if (length(x) == 1) {
+    x
+  } else {
+    paste(x, collapse = "\n")
+  }
+})]
+
+# paste into one value info if multiple values
+idref_individual_table[, `:=` (date_scrap = NULL)]  # Remove intermediate columns no longer needed
 
 # Process thesis_individual with a left join of idref_individual
 thesis_individual <- merge(
@@ -117,4 +126,5 @@ thesis_individual[, entity_firstname := str_to_title(entity_firstname)]
 thesis_individual <- thesis_individual[, .(entity_id, entity_name, entity_firstname, gender, gender_expanded,
                                    birth, country_name, information = info, organization, last_date_org, start_date_org, 
                                    end_date_org, other_link, homonym_of)]
+
 saveRDS(thesis_individual, here(FR_cleaned_data_path, "thesis_individual.rds"))
