@@ -36,7 +36,7 @@ bibliography: bibliography.bib
 source(here::here("paths_and_packages.R"))
 ```
 
-[![](https://zenodo.org/badge/DOI/10.5281/zenodo.14541427.svg)](https://doi.org/10.5281/zenodo.14541427)
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.14541427.svg)](https://doi.org/10.5281/zenodo.14541427){fig-align=center}
 
 # Introduction
 
@@ -109,8 +109,7 @@ If you use our code to extract data, it is essential to carefully assess the qua
 
 thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.rds"))
 
-p_load(DT, 
-       plotly)
+p_load(DT)
 ```
 
 
@@ -197,8 +196,7 @@ p <- thesis_metadata %>%
        y = "Number of theses") +
   theme_minimal() 
 
-p %>% 
-  plotly::ggplotly(tooltip = "text")
+print(p)
 
 ```
 
@@ -221,8 +219,7 @@ p <- thesis_metadata %>%
   theme_minimal() 
 
 
-p %>% 
-  plotly::ggplotly(tooltip = "text")
+print(p)
 ```
 
 
@@ -245,8 +242,7 @@ p <- thesis_metadata %>%
        fill = "Accessible") +
   theme_minimal()
 
-p %>%
-  plotly::ggplotly(tooltip = "text")
+print(p)
 
 
 ```
@@ -336,8 +332,7 @@ p <- thesis_edge %>%
        y = "Number of individuals") +
   theme_minimal()
 
-p %>% 
-  plotly::ggplotly(tooltip = "text")
+print(p)
 
 ```
 
@@ -362,8 +357,7 @@ p <- thesis_edge %>%
        y = "Number of edges") +
   theme_minimal()
 
-p %>% 
-  plotly::ggplotly(tooltip = "text")
+print(p)
 
 ```
 :::
@@ -549,8 +543,7 @@ p <- thesis_individual %>%
        x = "Gender Expanded") + 
   theme_minimal() 
 
-p %>% 
-  plotly::ggplotly(tooltip = "text")
+print(p)
   
   
   

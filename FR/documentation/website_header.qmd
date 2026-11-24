@@ -1,0 +1,27 @@
+---
+title: "Documentation: the French database"
+author: 
+  - name: "Thomas Delcey"
+    affiliation: "Université de Bourgogne"
+    email: "Thomas.delcey@u-bourgogne.fr"
+  - name: "Aurelien Goutsmedt"
+    affiliation: "UC Louvain; ICHEC"
+    email: "aurelien.goutsmedt[at]uclouvain.be" 
+format: html
+page-layout: full
+toc: true
+toc_float: true
+date: last-modified
+date-format: long
+image: "/assets/french_logo.png"
+image-width: "10%"
+bibliography: bibliography.bib
+execute:
+ echo: false
+ warning: false
+ message: false
+---
+
+::: {.column-margin}
+![](../../assets/french_logo.png)
+::: 

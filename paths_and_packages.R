@@ -20,23 +20,31 @@ setDTthreads(percent = 70)
 
 #### PATH ####
 
-#original text path stored in google drive 
-if(str_detect(getwd(), "tunex")){
+# The data live outside the repository, in a folder named "phd_data" shared
+# through Nextcloud. Each author's machine is recognised from the working
+# directory. Thomas's paths still point to the former Google Drive folder:
+# they must be replaced by the local copy of the shared Nextcloud "phd_data"
+# folder (a warning is raised below until then).
+if (str_detect(getwd(), "agoutsmedt")) {
+  data_path <- file.path(path.expand("~"), "Nextcloud/Research/data/phd_data")
+} else if (str_detect(getwd(), "tunex")) {
   data_path <- file.path(path.expand("~"), "google_drive/Mon Drive/Phd_Project/data")
 } else {
-  if(str_detect(getwd(), "Admin")) {
-    data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
-  } else {
-    if(str_detect(getwd(), "thomd")) {
-      data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
-    } else {
-      if(str_detect(getwd(), "agoutsmedt")) {
-        data_path <- "/home/agoutsmedt/google_drive/Phd_Project/data"
-      } else {
-        data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
-      }}}
-    print(paste("The path for data is", data_path))
-  }
+  # "Admin", "thomd" and any other machine
+  data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
+}
+
+cli::cli_alert_info("The path for data is {.path {data_path}}")
+if (basename(data_path) != "phd_data") {
+  cli::cli_warn(c(
+    "The data folder should now be the shared Nextcloud folder {.val phd_data}.",
+    "i" = "Current path: {.path {data_path}}.",
+    "i" = "Update {.file paths_and_packages.R} with the path of your local copy of {.val phd_data}."
+  ))
+}
+if (!dir.exists(data_path)) {
+  cli::cli_warn("The data folder {.path {data_path}} does not exist on this machine.")
+}
 
 # data type
 raw_data_path <- here(data_path, "raw_data")
