@@ -3,7 +3,7 @@
 # Goal: shared tools to (1) run the cleaning scripts of a country in order, by
 #   default on a test copy of the data, and (2) compare the tables produced with
 #   the current ones (in "phd_data"), so that every change in the data is known
-#   and can be written in the changelog (news/changelog/index.qmd) before a new
+#   and can be written in the changelog (news.qmd) before a new
 #   version is uploaded to Zenodo.
 #
 # Used by: <COUNTRY>/R/run_pipeline.R (e.g. FR/R/run_pipeline.R).
@@ -144,7 +144,7 @@ compare_runs <- function(new_root, old_root, subfolders, report_file, mask_temp 
   writeLines(c(
     glue("# Pipeline run of {Sys.Date()}"), "",
     glue("Comparison of the tables produced by the run with the current files in phd_data{if (mask_temp) ', temporary ids masked' else ''}."),
-    "Changes listed here must be described in news/changelog/index.qmd (section \"Unreleased\").", "",
+    "Changes listed here must be described in news.qmd (section \"Unreleased\").", "",
     knitr::kable(comparison, format = "pipe")
   ), report_file)
   cli_alert_success("Report written in {.file {report_file}}.")
