@@ -693,7 +693,7 @@ The value "Thèse" of the `Type` variable is default value when we cannot identi
 
 Note that the value of `Language` are also standardized to align with ISO conventions, ensuring compatibility with theses.fr data. 
 
-The final dataset is divided into four tables that constitute the relational database: metadata, edge, individual, and institution. For entities without official identifiers, temporary IDs are generated to enable future identification and disambiguation. Temporary identifiers are under the format `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr") and Y the type of record, followed by a hash of the record that keeps the identifier stable across versions (see @sec-temp-identifiers).
+The final dataset is divided into four tables that constitute the relational database: metadata, edge, individual, and institution. For entities without official identifiers, temporary IDs are generated to enable future identification and disambiguation. Temporary identifiers are under the format `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr") and Y the type of record, followed by a hash of the record that keeps the identifier stable across versions (see "Temporary identifiers" above).
 
 ### Theses.fr 
 

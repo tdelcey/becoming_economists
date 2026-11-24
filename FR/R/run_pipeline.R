@@ -14,7 +14,7 @@
 #     `test_root`), the shared files in phd_data are untouched;
 #   - a comparison report in FR/pipeline_log/<date>.md (commit it), listing what
 #     changed with respect to the current tables: describe these changes in
-#     news/changelog/index.qmd ("Unreleased" section of the French database);
+#     news.qmd ("Unreleased" section of the French database);
 #   - production mode (`test_mode <- FALSE` and `confirm_overwrite <- TRUE`): the
 #     shared intermediate and cleaned files in phd_data are overwritten. Do it
 #     only after checking the report of a test run.

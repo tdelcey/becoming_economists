@@ -4,8 +4,8 @@ image: "/assets/website_logo.png"
 ---
 
 <!--
-Single source: this file lives in the private repository (news/changelog/index.qmd)
-and is copied to the website by publish_website.R and to the public repository
+Single source: this file lives in the private repository (news.qmd)
+and is copied to the website (as news/changelog/index.qmd) by publish_website.R and to the public repository
 by publish_public.R. Edit it only there.
 
 How to use it: every change in the scripts that modifies the published data goes
@@ -22,7 +22,11 @@ All versions: [10.5281/zenodo.14541426](https://doi.org/10.5281/zenodo.14541426)
 
 ## Unreleased
 
-These corrections will be included in the next version of the database on Zenodo.
+## Version 1.1 (2026-11-24)
+
+[10.5281/zenodo.24496011](https://doi.org/10.5281/zenodo.24496011)
+
+Corrections of mistakes, without new data or change of structure.
 
 - **Institution of defence for theses.fr theses.** The columns `institution_thesis_name` and `institution_thesis_id` of `thesis_metadata` were empty for the 12,191 theses coming from theses.fr. They are now filled.
 - **Harmonised roles in `thesis_edge`.** The roles of theses.fr were spelled differently from those of Sudoc: `institution_defense` is now `institution_defence`, and `doctoral_schools` is now `doctoral_school`, as for Sudoc data.

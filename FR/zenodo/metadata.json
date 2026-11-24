@@ -1,5 +1,5 @@
 {
-  "_comment": "Metadata of the French dataset on Zenodo, in the format of the Zenodo deposit API (taken from version 2025-04-23, citation DOI changed to the concept DOI). Concept record: 14541426 (all versions). Set \"version\" before each upload.",
+  "_comment": "Metadata of the French dataset on Zenodo, in the format of the Zenodo deposit API (from version 2025-04-23; citation DOI changed to the concept DOI, links to code and changelog added for version 1.1). Concept record: 14541426 (all versions). The version number is set by publish_zenodo.R.",
   "concept_recid": "14541426",
   "sandbox_concept_recid": "",
   "metadata": {
@@ -20,6 +20,27 @@
     ],
     "license": "cc-by-4.0",
     "access_right": "open",
-    "description": "<p>This database compiles information on Ph.D. dissertations in economics defended in France since 1900. See <a title=\"Becoming Economists Website\" href=\"https://tdelcey.github.io/becoming_economists_page/\" target=\"_blank\" rel=\"noopener\">our companion website </a>for news and full documentation.</p>\n<p>The French database is implemented as a relational database that integrates multiple interconnected data frames. It is organized around four main components:</p>\n<ul>\n<li><strong>Thesis Metadata:</strong> This table contains the core information for each dissertation. Each entry corresponds to a single thesis and includes details such as the title, defense date, abstract, and other relevant metadata.</li>\n<li><strong>Edges Data:</strong> This table captures the connections between the other three tables, linking individuals, institutions, and theses. It associates each thesis with the individuals and institutions involved in its production, thereby enabling a synthetized view of these relationships. The edges data are provided in two formats: (1) a ready-to-use format with cleaned and standardized information; and (2) a more &nbsp; extensive format that allows for comparison between the original&nbsp; collected data and the results of the cleaning process.</li>\n<li><strong>Institutions Data:</strong> This table includes information on universities, laboratories, doctoral schools, and other institutions associated with the dissertations. Each entry corresponds to a single institution.</li>\n<li><strong>Individual Data:</strong> This table contains information on the individuals involved in the dissertations, including authors, supervisors, and jury members. Each entry corresponds to a single individual.</li>\n</ul>\n<p>The data used in this project comes from three mains sources:&nbsp;</p>\n<ul>\n<li><strong>Theses.fr:</strong>&nbsp;<a href=\"https://theses.fr/\" target=\"_blank\" rel=\"noopener\">https://theses.fr/</a></li>\n<li><strong>Sudoc:</strong>&nbsp; <a href=\"https://www.sudoc.fr/\" target=\"_blank\" rel=\"noopener\">https://www.sudoc.fr/</a></li>\n<li><strong>IdRef:</strong>&nbsp; <a href=\"https://www.idref.fr/\" target=\"_blank\" rel=\"noopener\">https://www.idref.fr/</a></li>\n</ul>\n<p>If you use our data or scripts, please cite the following reference: &ldquo;Delcey Thomas, and Aur&eacute;lien Goutsmedt. (2024). Becoming an Economist: A Database of French Economics PhDs. Zenodo. https://doi.org/10.5281/zenodo.14541426&rdquo;</p>\n<p>&nbsp;</p>"
+    "description": "<p>This database compiles information on Ph.D. dissertations in economics defended in France since 1900. See <a title=\"Becoming Economists Website\" href=\"https://tdelcey.github.io/becoming_economists_page/\" target=\"_blank\" rel=\"noopener\">our companion website </a>for news and full documentation.</p>\n<p>The French database is implemented as a relational database that integrates multiple interconnected data frames. It is organized around four main components:</p>\n<ul>\n<li><strong>Thesis Metadata:</strong> This table contains the core information for each dissertation. Each entry corresponds to a single thesis and includes details such as the title, defense date, abstract, and other relevant metadata.</li>\n<li><strong>Edges Data:</strong> This table captures the connections between the other three tables, linking individuals, institutions, and theses. It associates each thesis with the individuals and institutions involved in its production, thereby enabling a synthetized view of these relationships. The edges data are provided in two formats: (1) a ready-to-use format with cleaned and standardized information; and (2) a more &nbsp; extensive format that allows for comparison between the original&nbsp; collected data and the results of the cleaning process.</li>\n<li><strong>Institutions Data:</strong> This table includes information on universities, laboratories, doctoral schools, and other institutions associated with the dissertations. Each entry corresponds to a single institution.</li>\n<li><strong>Individual Data:</strong> This table contains information on the individuals involved in the dissertations, including authors, supervisors, and jury members. Each entry corresponds to a single individual.</li>\n</ul>\n<p>The data used in this project comes from three mains sources:&nbsp;</p>\n<ul>\n<li><strong>Theses.fr:</strong>&nbsp;<a href=\"https://theses.fr/\" target=\"_blank\" rel=\"noopener\">https://theses.fr/</a></li>\n<li><strong>Sudoc:</strong>&nbsp; <a href=\"https://www.sudoc.fr/\" target=\"_blank\" rel=\"noopener\">https://www.sudoc.fr/</a></li>\n<li><strong>IdRef:</strong>&nbsp; <a href=\"https://www.idref.fr/\" target=\"_blank\" rel=\"noopener\">https://www.idref.fr/</a></li>\n</ul>\n<p>The scripts used to collect and clean the data are available on <a href=\"https://github.com/tdelcey/becoming_economists\" target=\"_blank\" rel=\"noopener\">GitHub</a>. The changes between versions are listed in the <a href=\"https://tdelcey.github.io/becoming_economists_page/news/changelog/\" target=\"_blank\" rel=\"noopener\">changelog</a>.</p>\n<p>If you use our data or scripts, please cite the following reference: &ldquo;Delcey Thomas, and Aur&eacute;lien Goutsmedt. (2024). Becoming an Economist: A Database of French Economics PhDs. Zenodo. https://doi.org/10.5281/zenodo.14541426&rdquo;</p>\n<p>&nbsp;</p>",
+    "related_identifiers": [
+      {
+        "identifier": "https://github.com/tdelcey/becoming_economists",
+        "relation": "isSupplementedBy",
+        "resource_type": "software",
+        "scheme": "url"
+      },
+      {
+        "identifier": "https://tdelcey.github.io/becoming_economists_page/documentation/french/",
+        "relation": "isDocumentedBy",
+        "resource_type": "publication-other",
+        "scheme": "url"
+      }
+    ]
+  },
+  "latest": {
+    "server": "https://zenodo.org/api",
+    "version": "1.1",
+    "recid": "24496011",
+    "doi": "10.5281/zenodo.24496011",
+    "date": "2026-11-24"
   }
 }
