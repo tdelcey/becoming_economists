@@ -36,7 +36,7 @@ bibliography: bibliography.bib
 source(here::here("paths_and_packages.R"))
 ```
 
-[![](https://zenodo.org/badge/DOI/10.5281/zenodo.14541427.svg)](https://doi.org/10.5281/zenodo.14541427){fig-align=center}
+[![](https://zenodo.org/badge/DOI/10.5281/zenodo.14541426.svg)](https://doi.org/10.5281/zenodo.14541426){fig-align=center}
 
 # Introduction
 
@@ -74,9 +74,9 @@ Our data-building approach focuses on ensuring consistency and quality while pre
 
 ## Usage and Access
 
-Our database is released under the  [CC-BY-4.0 licence](https://creativecommons.org/licenses/by/4.0/). allowing free access and use by anyone. The data is hosted in a [Zenodo repository](https://doi.org/10.5281/zenodo.14541427). While the database focuses on Ph.D. dissertations in economics and queries sources based on the field of the thesis, the scripts have been designed with flexibility. They can be adapted for other queries involving notably different disciplines.
+Our database is released under the  [CC-BY-4.0 licence](https://creativecommons.org/licenses/by/4.0/). allowing free access and use by anyone. The data is hosted in a [Zenodo repository](https://doi.org/10.5281/zenodo.14541426). While the database focuses on Ph.D. dissertations in economics and queries sources based on the field of the thesis, the scripts have been designed with flexibility. They can be adapted for other queries involving notably different disciplines.
 
-If you use our data or scripts, please cite the following reference:  "Delcey Thomas, and Aurélien Goutsmedt. (2024). Becoming an Economist: A Database of French Economics PhDs. Zenodo. https://doi.org/10.5281/zenodo.14541427"
+If you use our data or scripts, please cite the following reference:  "Delcey Thomas, and Aurélien Goutsmedt. (2024). Becoming an Economist: A Database of French Economics PhDs. Zenodo. https://doi.org/10.5281/zenodo.14541426"
 
 ```{bibtex}
 #| echo: true
@@ -86,7 +86,7 @@ If you use our data or scripts, please cite the following reference:  "Delcey Th
   author={Delcey, Thomas and Goutsmedt, Aurélien},
   journal={Zenodo},
   year={2024},
-  doi={https://doi.org/10.5281/zenodo.14541427}
+  doi={https://doi.org/10.5281/zenodo.14541426}
 }
 ```
 
@@ -140,7 +140,7 @@ The `thesis_metadata` table contains `r ncol(thesis_metadata)` variables:
 
 ### Temporary identifiers {#sec-temp-identifiers}
 
-When we were unable to provide an ABES identifiers for a thesis or entity, we created our own unique "temporary identifiers" coded as follows `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr") and Y being a randomly generated unique number. We refer to these identifiers as temporary because they may be replaced in future updates by ABES identifiers, either as ABES updates its sources or as we improve our cleaning process.
+When we were unable to provide an ABES identifiers for a thesis or entity, we created our own unique "temporary identifiers" coded as follows `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr"), Y the type of record ("thesis", "individual" or "institution"), followed by a hash of the record (for a thesis, its Sudoc url; for an entity, the thesis identifier, its role, name and first name). The same record thus keeps the same identifier from one version of the database to the next (before November 2026, these identifiers were random numbers regenerated at each update). We refer to these identifiers as temporary because they may be replaced in future updates by ABES identifiers, either as ABES updates its sources or as we improve our cleaning process.
 ::: 
 
 ::: {.callout-warning #warning-language}
@@ -638,8 +638,8 @@ Theses records are registered in [theses.fr](https://theses.fr/) since 1985. The
 ### Sudoc 
 
 ```{r}
-urls_econ <- readRDS(here(FR_sudoc_raw_data_path, glue("sudoc_urls_economics_1900-1985.RDS")))
-urls_law <- readRDS(here(FR_sudoc_raw_data_path, glue("sudoc_urls_law_1900-1968.RDS")))
+urls_econ <- readRDS(here(FR_sudoc_raw_data_path, glue("sudoc_urls_economics_1900-1985.rds")))
+urls_law <- readRDS(here(FR_sudoc_raw_data_path, glue("sudoc_urls_law_1900-1968.rds")))
 ```
 
 We systematically collect metadata on French theses archived in the [Sudoc](https://www.sudoc.fr/) database, focusing on theses in economics. To identify theses in economics, we employ a dual-query approach:
@@ -693,7 +693,7 @@ The value "Thèse" of the `Type` variable is default value when we cannot identi
 
 Note that the value of `Language` are also standardized to align with ISO conventions, ensuring compatibility with theses.fr data. 
 
-The final dataset is divided into four tables that constitute the relational database: metadata, edge, individual, and institution. For entities without official identifiers, temporary IDs are generated to enable future identification and disambiguation. Temporary identifiers are under the format `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr") and Y being a randomly generated unique number.
+The final dataset is divided into four tables that constitute the relational database: metadata, edge, individual, and institution. For entities without official identifiers, temporary IDs are generated to enable future identification and disambiguation. Temporary identifiers are under the format `temp_X_Y`, X representing the source of the original information (either "sudoc" or "thesesfr") and Y the type of record, followed by a hash of the record that keeps the identifier stable across versions (see @sec-temp-identifiers).
 
 ### Theses.fr 
 

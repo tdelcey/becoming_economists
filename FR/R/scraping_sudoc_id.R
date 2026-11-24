@@ -80,8 +80,8 @@ pages <- str_c(current_url, seq(1, number_of_doc))  # List of all result pages U
 #' where it has been saved for the last time.
 
 # Check if URLs are already saved for this session, and create the object if needed
-if (glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.RDS") %in% list.files(FR_sudoc_raw_data_path)) {
-  urls <- readRDS(here(FR_sudoc_raw_data_path, glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.RDS")))
+if (glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.rds") %in% list.files(FR_sudoc_raw_data_path)) {
+  urls <- readRDS(here(FR_sudoc_raw_data_path, glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.rds")))
 } else {
   urls <- vector(mode = "character", length = length(pages))
 }
@@ -121,7 +121,7 @@ for(i in (k + 1):length(pages)){
     # Save progress every 100 pages or at the last page
     if (i %% 100 == 0 | i == length(pages)) {
       saveRDS(urls,
-              here(FR_sudoc_raw_data_path, glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.RDS")))
+              here(FR_sudoc_raw_data_path, glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.rds")))
     }
     
   }, error = function(e) {
@@ -132,5 +132,5 @@ for(i in (k + 1):length(pages)){
 
 # Final save of URLs after loop completes
 saveRDS(urls,
-        here(FR_sudoc_raw_data_path, glue::glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.RDS")))
+        here(FR_sudoc_raw_data_path, glue::glue("sudoc_urls_{user_choice}_{first_year}-{last_year}.rds")))
 remDr$server$stop()  # Stop RSelenium server

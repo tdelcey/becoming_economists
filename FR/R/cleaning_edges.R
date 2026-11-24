@@ -28,9 +28,8 @@ new_ids <- thesis_institution[! is.na(old_id), .(new_id = entity_id, old_id = ol
   unique()
 
 # 2. Match old IDs to entity IDs in thesis_edge and replace with new IDs.
-institution_filter <- c("institution_defense",
-                        "research_partner",
-                        "doctoral_schools",
+institution_filter <- c("research_partner",
+                        "doctoral_school",
                         "institution_defence",
                         "institution_defence_from_info",
                         "laboratory")  # Filter for relevant institution roles

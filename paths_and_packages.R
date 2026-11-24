@@ -34,6 +34,14 @@ if (str_detect(getwd(), "agoutsmedt")) {
   data_path <- "G:/.shortcut-targets-by-id/1Lhjzr0rDBjblTPYh9PoVBsi_uupV9z8L/Phd_Project/data"
 }
 
+# Test mode: set the environment variable PHD_DATA_PATH to run the scripts on
+# another copy of the data (e.g. a test folder whose raw_data/ links to the real
+# one), so that a rerun never overwrites the shared intermediate or cleaned files.
+if (nzchar(Sys.getenv("PHD_DATA_PATH"))) {
+  data_path <- Sys.getenv("PHD_DATA_PATH")
+  cli::cli_alert_warning("Test mode: PHD_DATA_PATH is set.")
+}
+
 cli::cli_alert_info("The path for data is {.path {data_path}}")
 if (basename(data_path) != "phd_data") {
   cli::cli_warn(c(

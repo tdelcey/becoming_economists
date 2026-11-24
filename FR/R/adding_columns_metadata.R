@@ -10,13 +10,16 @@
 source(file.path("paths_and_packages.R"))
 
 thesis_metadata <- readRDS(here(FR_cleaned_data_path, "thesis_metadata.rds"))
+# The script overwrites thesis_metadata.rds: drop the columns it adds, if present, so that it
+# can be rerun without duplicating them.
+thesis_metadata <- thesis_metadata[, !(names(thesis_metadata) %in% c("author", "author_id", "institution_thesis_name", "institution_thesis_id")), with = FALSE]
 thesis_edge <- readRDS(here(FR_cleaned_data_path, "thesis_edge.rds"))
 
 # Extracting authors and institutions of defence----------------
 authors <- thesis_edge[entity_role == "author", .(thesis_id, entity_name, entity_firstname, author_id = entity_id)]
 authors <- authors[, author := str_c(entity_firstname, ", ", entity_name)][, .(thesis_id, author, author_id)]
 
-# Check that there is only one author per these_id
+# Check that there is only one author per thesis_id
 stopifnot(all(authors[, .N, by = thesis_id]$N == 1))
 
 institutions <- thesis_edge[entity_role %in% c("institution_defence", "institution_defence_from_info"), .(thesis_id, institution_thesis_name = entity_name, institution_thesis_id = entity_id)]

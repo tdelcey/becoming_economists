@@ -1,6 +1,6 @@
 # This script allows for launching various scripts of the project in the background
-source(here::here("scripts", "paths_and_packages.R"))
-source(here("scripts", "helper_scripts", "helper_functions.R"))
+source(here::here("paths_and_packages.R"))
+source(here("FR", "R", "helper_functions.R"))
 pacman::p_load(rstudioapi)
 
 # Scraping of Sudoc-----------

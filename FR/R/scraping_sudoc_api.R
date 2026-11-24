@@ -191,4 +191,4 @@ sudoc_metadata <- future_map2(.x = df_urls$url,
 # Final Save of All Metadata ----------------------------------------------------------------
 final_metadata <- list_rbind(sudoc_metadata)
 
-saveRDS(final_metadata, here(FR_sudoc_raw_data_path, "sudoc_metadata.RDS"))
+saveRDS(final_metadata, here(FR_sudoc_raw_data_path, "sudoc_metadata.rds"))

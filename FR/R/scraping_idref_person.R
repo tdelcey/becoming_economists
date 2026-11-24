@@ -24,7 +24,7 @@ source(file.path("FR", "R", "helper_functions.R")) # xml_text_in_list()
 
 # Prepare the List of IdRefs to Search -----------------------------------------------
 # Load pre-scraped thesis data and identify individuals with valid IdRefs (excluding temporary IDs).
-idrefs <- readRDS(here(FR_intermediate_data_path, "thesis_person.rds")) %>%
+idrefs <- readRDS(here(FR_intermediate_data_path, "thesis_individual.rds")) %>%
   filter(!str_detect(entity_id, "^temp")) %>% 
   pull(entity_id) %>% 
   unique()

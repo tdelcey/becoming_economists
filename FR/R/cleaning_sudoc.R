@@ -3,9 +3,10 @@
 # Load Data and Packages -----------------------------------------------------
 # Load required packages and scripts for handling paths and functions
 source(file.path("paths_and_packages.R"))
+source(file.path("FR", "R", "helper_functions.R")) # make_temp_id()
 
 # Load the data saved in scraping_scripts/FR/scraping_sudoc_api.R.
-data <- readRDS(here(FR_sudoc_raw_data_path, "sudoc_metadata.RDS"))
+data <- readRDS(here(FR_sudoc_raw_data_path, "sudoc_metadata.rds"))
 
 # Managing Duplicated Data --------------------------------------------------
 # Two types of duplicates are addressed:
@@ -81,6 +82,8 @@ all_dates <- date_clean %>%
   sort()
 if(any(! all_dates %in% 1899:1985)){ # 1899 is ok
   problematic_dates <- all_dates[which(! all_dates %in% 1899:1985)]
+  #' Known case (checked in November 2026): "Le Bazar de Téhéran" (https://www.sudoc.fr/121756483)
+  #' only has a 2004 date in Sudoc, probably the publication of an earlier thesis. We keep it.
   cli_alert_warning(glue("One or several dates are outside of the time period used in SUDOC query: {str_flatten_comma(problematic_dates)}. To check!!"))
   
   date_clean %>% 
@@ -187,6 +190,8 @@ if(data %>% pull(field) %>% map_int(length) %>% { all(. < 2L)}){
 
 #' We first check for the possibility of two different languages for the same thesis. Then we recode 
 #' language values to standardize them with those extracted in theses.fr.
+#' Known case: one thesis (https://www.sudoc.fr/06266848X) has two languages (fre, eng); it is
+#' handled below by moving the second language to `language_2`.
 if(data %>% pull(language) %>% map_int(length) %>% { any(. > 1L)}){
   cli_alert_danger("Several languages per row. We need to check the code and concatenate them.")
   data %>% 
@@ -235,8 +240,12 @@ data <- data %>%
   rename(thesis_id = nnt) %>% 
   mutate(accessible = NA_character_, # for conformity with theses.fr
          url = str_remove(url, "\\.xml$"), # for a more standard format url, going directly to the sudoc webpage
-         country = "France",
-         thesis_id = ifelse(is.na(thesis_id), paste0("temp_sudoc_thesis_", sample(100000:999999, nrow(.))), thesis_id))
+         country = "France")
+
+#' Theses without NNT get a deterministic temporary id built from their Sudoc url
+#' (see `make_temp_id()` in helper_functions.R): it does not change between runs.
+missing_thesis_id <- is.na(data$thesis_id)
+data$thesis_id[missing_thesis_id] <- make_temp_id("temp_sudoc_thesis", data$url[missing_thesis_id])
 
 ## Select and save metadata variables ------------
 
@@ -262,7 +271,8 @@ saveRDS(sudoc_metadata, here(FR_sudoc_intermediate_data_path, "sudoc_metadata.rd
 ## Creating Edge Table--------
 
 #' One important step here is to create an id for each entity (individual or institution) that is not identified by an idref.
-#' We will differentiate them by a prefix "temp_sudoc_individual_" or "temp_sudoc_institution_" followed by a random number. 
+#' We differentiate them by a prefix "temp_sudoc_individual_" or "temp_sudoc_institution_" followed by a hash of
+#' the thesis id, role, position in the role, name and first name (deterministic, see `make_temp_id()`).
 sudoc_edge <- data %>% 
   select(thesis_id,
          author_idref,
@@ -299,14 +309,16 @@ sudoc_edge <- data %>%
   rename(entity_role = role,
          entity_id = idref,
          entity_name = name,
-         entity_firstname = firstname) %>% 
-  select(-order) %>% 
-  mutate(entity_id = ifelse(is.na(entity_id) & str_detect(entity_role, "author|member|supervisor|reviewer|president"), 
-                        paste0("temp_sudoc_individual_", 
-                               sample(100000:999999, nrow(.))), entity_id),
-         entity_id = ifelse(is.na(entity_id) & str_detect(entity_role, "institution|school|partner|laboratory"), 
-                            paste0("temp_sudoc_institution_", 
-                                   sample(100000:999999, nrow(.))), entity_id)) 
+         entity_firstname = firstname)
+
+missing_individual <- is.na(sudoc_edge$entity_id) & str_detect(sudoc_edge$entity_role, "author|member|supervisor|reviewer|president")
+sudoc_edge$entity_id[missing_individual] <- with(sudoc_edge[missing_individual, ],
+  make_temp_id("temp_sudoc_individual", thesis_id, entity_role, order, entity_name, entity_firstname))
+missing_institution <- is.na(sudoc_edge$entity_id) & str_detect(sudoc_edge$entity_role, "institution|school|partner|laboratory")
+sudoc_edge$entity_id[missing_institution] <- with(sudoc_edge[missing_institution, ],
+  make_temp_id("temp_sudoc_institution", thesis_id, entity_role, order, entity_name))
+sudoc_edge <- sudoc_edge %>% 
+  select(-order)
 
 # We add a source file necessary to clean doublons later
 sudoc_edge <- sudoc_edge %>% 

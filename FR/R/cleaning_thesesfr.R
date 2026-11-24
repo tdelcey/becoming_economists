@@ -3,6 +3,7 @@
 # Load Data and Packages -----------------------------------------------------
 # Load required packages and scripts for handling paths and functions
 source(file.path("paths_and_packages.R"))
+source(file.path("FR", "R", "helper_functions.R")) # make_temp_id()
 
 full_raw_theses <- read_rds(here(FR_raw_data_path, "theses.fr", "data_theses_fr.rds")) %>% 
   as.data.table()
@@ -114,14 +115,18 @@ edge_table_temp[, c("role", "order", "info") := tstrsplit(variable, ".", fixed =
 edge_table_temp <- data.table::dcast(edge_table_temp, nnt + role + order ~ info, value.var = "value")
 edge_table_temp <- edge_table_temp[, `:=` (order = NULL,
                                            type = NULL)]
-edges_table_temp <- edge_table_temp[!(is.na(nom) & is.na(idref))] # in case we have elements with no information at all
-edges_table_temp <- unique(edges_table_temp) # Cleaning duplicates in research partner (problem in the original theses.fr database)
+# Until November 2026, the two lines below were assigned to a misspelled object (`edges_table_temp`),
+# so the filtering and the de-duplication were never applied.
+edge_table_temp <- edge_table_temp[!(is.na(nom) & is.na(idref))] # in case we have elements with no information at all
+edge_table_temp <- unique(edge_table_temp) # Cleaning duplicates in research partner (problem in the original theses.fr database)
 
-# Generate temporary IDs for entities lacking official identifiers (we will try disambuigating them later)
+# Generate temporary IDs for entities lacking official identifiers (we will try disambuigating them later).
+# The ids are deterministic hashes of thesis id, role, name and first name (see `make_temp_id()`),
+# so they do not change between runs or when new theses are added.
 edge_table_temp[is.na(idref) & str_detect(role, "auteur|membres|directeurs|rapporteurs|president"), 
-                idref := paste0("temp_thesefr_individual_", 100000:(100000+.N-1))]
+                idref := make_temp_id("temp_thesefr_individual", nnt, role, nom, prenom)]
 edge_table_temp[is.na(idref) & str_detect(role, "etablissements|ecoles|partenaires"), 
-                idref := paste0("temp_thesefr_institution_", 100000:(100000+.N-1))]
+                idref := make_temp_id("temp_thesefr_institution", nnt, role, nom)]
 
 # Rename columns for consistency and save the edge table
 setnames(edge_table_temp, 
@@ -134,8 +139,11 @@ edge_table_temp[, entity_role := str_replace(entity_role, "directeurs_these", "s
 edge_table_temp[, entity_role := str_replace(entity_role, "rapporteurs", "reviewer")]
 edge_table_temp[, entity_role := str_replace(entity_role, "membres_jury", "member")]
 edge_table_temp[, entity_role := str_replace(entity_role, "president_jury", "president")]
-edge_table_temp[, entity_role := str_replace(entity_role, "etablissements_soutenance", "institution_defense")]
-edge_table_temp[, entity_role := str_replace(entity_role, "ecoles_doctorale", "doctoral_school")]
+# Role names are the same as in cleaning_sudoc.R ("institution_defence", "doctoral_school"). Until
+# November 2026 theses.fr used "institution_defense" and "doctoral_schools", so the institution of
+# defence of theses.fr theses was missing in thesis_metadata (see adding_columns_metadata.R).
+edge_table_temp[, entity_role := str_replace(entity_role, "etablissements_soutenance", "institution_defence")]
+edge_table_temp[, entity_role := str_replace(entity_role, "ecoles_doctorales?", "doctoral_school")]
 edge_table_temp[, entity_role := str_replace(entity_role, "partenaires_recherche", "research_partner")]
 
 # We add a source file necessary to clean doublons later

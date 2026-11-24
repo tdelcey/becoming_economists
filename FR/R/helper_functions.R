@@ -282,3 +282,38 @@ matching_duplicate_manually <- function(data, id_ref, pattern) {
   
   return(match)
 }
+
+# Cleaning helper functions---------------------
+
+#' make_temp_id
+#'
+#' @description
+#' Build deterministic temporary identifiers (`temp_<source>_<type>_<hash>`) for
+#' theses or entities that have no official identifier (NNT or IdRef).
+#'
+#' @details
+#' Until November 2026 temporary identifiers were random numbers, so they changed at
+#' each run of the pipeline and published identifiers could not be reproduced. The
+#' identifier is now a 64-bit xxhash of a key describing the record (e.g. the Sudoc
+#' url for a thesis; thesis id, role, name, first name and position for an entity):
+#' the same record always gets the same identifier, and adding new records does not
+#' change the identifiers of existing ones (unlike sequential numbers).
+#' The key must identify the record uniquely: the function stops if two different
+#' records share a key, and if two keys give the same hash.
+#'
+#' @param prefix Character, e.g. "temp_sudoc_thesis".
+#' @param ... Vectors pasted together (separated by "|") to build the key.
+#'
+#' @return A character vector of identifiers, e.g. "temp_sudoc_thesis_3f9a0c1d2e4b5a69".
+make_temp_id <- function(prefix, ...) {
+  keys <- paste(..., sep = "|")
+  hashes <- vapply(keys, digest::digest, character(1), algo = "xxhash64", serialize = FALSE,
+                   USE.NAMES = FALSE)
+  if (anyDuplicated(keys) > 0) {
+    cli::cli_abort("{sum(duplicated(keys))} duplicated key{?s} for {.val {prefix}}: the key does not identify records uniquely.")
+  }
+  if (anyDuplicated(hashes) > 0) {
+    cli::cli_abort("Hash collision for {.val {prefix}}.")
+  }
+  paste0(prefix, "_", hashes)
+}

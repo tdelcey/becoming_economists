@@ -1,0 +1,55 @@
+---
+title: "Changelog - Becoming Economists Project"
+image: "/assets/website_logo.png"
+---
+
+<!--
+Single source: this file lives in the private repository (news/changelog/index.qmd)
+and is copied to the website by publish_website.R and to the public repository
+by publish_public.R. Edit it only there.
+
+How to use it: every change in the scripts that modifies the published data goes
+under "Unreleased" of the database concerned, in the same commit as the change
+(the report of FR/R/run_pipeline.R in FR/pipeline_log/ lists what changed). When
+a new version is uploaded to Zenodo, rename "Unreleased" as
+"Version X.Y (YYYY-MM-DD)" with the DOI of the version, and open a new
+"Unreleased" section.
+-->
+
+# French Database
+
+All versions: [10.5281/zenodo.14541426](https://doi.org/10.5281/zenodo.14541426) (this DOI always points to the latest version).
+
+## Unreleased
+
+These corrections will be included in the next version of the database on Zenodo.
+
+- **Institution of defence for theses.fr theses.** The columns `institution_thesis_name` and `institution_thesis_id` of `thesis_metadata` were empty for the 12,191 theses coming from theses.fr. They are now filled.
+- **Harmonised roles in `thesis_edge`.** The roles of theses.fr were spelled differently from those of Sudoc: `institution_defense` is now `institution_defence`, and `doctoral_schools` is now `doctoral_school`, as for Sudoc data.
+- **Stable temporary identifiers.** The temporary identifiers of theses, individuals and institutions without official identifiers (`temp_sudoc_*`, `temp_thesefr_*`) were random numbers, regenerated each time the database was built. They are now built from the record itself (format `temp_X_Y_<hash>`), so that they stay the same from one version to the next. All temporary identifiers change once in this version.
+- **Duplicated research partners.** 97 duplicated links between theses.fr theses and research partners, and one empty institution, are removed from `thesis_edge`, `thesis_edge_complete_data` and `thesis_institution`.
+
+## 2025-04-23
+
+[10.5281/zenodo.15270248](https://doi.org/10.5281/zenodo.15270248)
+
+- Correcting a mistake in the table `thesis_individual`. The column `info` was not correctly filled with the information from idref.
+
+## 2025-01-22
+
+[10.5281/zenodo.14718814](https://doi.org/10.5281/zenodo.14718814)
+
+- Adding new columns to the `thesis_metadata` table: `author`, `author_id`, `institution_thesis_name`, `institution_thesis_id`.
+- The table `thesis_person` is renamed `thesis_individual`.
+
+## 2025-01-21
+
+[10.5281/zenodo.14713202](https://doi.org/10.5281/zenodo.14713202)
+
+- **Official release of the version 1.0 of the French database.**
+
+## 2024-12-21
+
+[10.5281/zenodo.14541427](https://doi.org/10.5281/zenodo.14541427)
+
+- First version deposited on Zenodo.
